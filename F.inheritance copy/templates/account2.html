@@ -5,41 +5,47 @@ Student Number:21025329-->
 
 
 {%block head %}
-    {%block title%}  {%endblock%}
+    {%block title%} 
+    <div class ="header"> <h1> Evan </h1> </div>
+    {%endblock%}
 {%endblock%}
 
+
 {%block content%}
-<div class = "">
-    <a class = "secondary" href="/" target="_self"> <span class="font">Evan</span> your personal budgeting assistant </a> 
-</div>
+<!--<div class = "header">
+    <a class = "heading" href="/" target="_self"> <span class="font">Evan</span> your personal budgeting assistant </a> 
+</div>-->
 
 
 <div class="container"> 
-<div> 
-    <!--gives the user the option to register if they don't already have an account-->
-    <span class="login-form"> Register </span>
-    <p style="color:brown;">{{error}}</p>
-    <form action="/register/" method="post"> 
-        <label for="Username">Username:</label> 
-        <input type="text" name="username" value="{{request.form.username}}"></br>
-        <label for="password">Password:</label>
-        <input type="password" name="password"value="{{request.form.password}}"></br>
-        <label for="email"> Email:</label>
-        <input type="email" name="email" value="{{request.form.email}}" size="40"> </br>
-        <input type="submit" class= "button" value="Register">
-    </form> </div>
+    <div class="login"> 
+        <!--gives the user the option to register if they don't already have an account-->
+        <h1 style="text-align: center;">Register or Log in</h1>
+        <div class="option">
+                <p style="color:red;">{{error}}</p>
+                <form action="/register/" method="post"> 
 
-    <!-- user log in if they already have an account -->
-<div> <span class="heading">Log in</span>
-<p style="color:red;"> {{error}} </p>
-<form action="/login/" method="post"> 
-  <label for="Username">Username:</label> 
-  <input type="text" name="username" value="{{request.form.username}}"></br>
-  <label for="password">Password:</label>
-  <input type="password" name="password" value="{{request.form.password}}"></br>
-   <input type="submit" class= "button" value="Login">
-</form></div>
-    
+                    <label for="Username" class="font">  Username: </label> 
+                    <input class ="logInput" type="text" name="username" value="{{request.form.username}}"></br>
+
+                    <label for="password"class="font">Password:</label>
+                    <input  class="logInput"type="password" name="password"value="{{request.form.password}}"></br>
+                    <input type="submit" class= "logButton" value="Register"></br>
+                </form> 
+
+                
+            
+                <p style="color:red;"> {{error}} </p>
+                <form action="/login/" method="post"> 
+                <label for="Username" class="font">Username:</label> 
+                <input class="logInput"type="text" name="username" value="{{request.form.username}}"></br>
+                <label for="password" class="font">Password:</label>
+                <input class="logInput" type="password" name="password" value="{{request.form.password}}"></br>
+                <input type="submit" class= "logButton" value="Login">
+                </form>
+            </div>
+    </div>
+
 </div> 
 <!-- consults the database to decide if they should send the user down the path of admin or standar user-->
 {% if usertype == 'admin' %}

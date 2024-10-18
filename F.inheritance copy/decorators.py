@@ -187,9 +187,8 @@ def register():
     try:
         if request.method == "POST":         
             username = request.form['username']
-            password = request.form['password']
-            email = request.form['email']                      
-            if username != None and password != None and email != None:           
+            password = request.form['password']                    
+            if username != None and password != None:           
                 conn = dbfunc.getConnection()
                 if conn != None:    #Checking if connection is None           
                     if conn.is_connected(): #Checking if connection is established
@@ -205,8 +204,7 @@ def register():
                             error = "User name already taken, please choose another"
                             return render_template("account2.html", error=error)    
                         else:   #this means we can add new user             
-                            dbcursor.execute("INSERT INTO users (username, password_hash, \
-                                 email) VALUES (%s, %s, %s)", (username, password, email))                
+                            dbcursor.execute("INSERT INTO users (username, password_hash VALUES (%s, %s)", (username, password))                
                             conn.commit()  #saves data in database              
                             print("Thanks for registering!")
                             dbcursor.close()
