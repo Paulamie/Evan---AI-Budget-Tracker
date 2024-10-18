@@ -1,0 +1,53 @@
+<!-- HTML file, confirms all the details seletec by the user and prompts them to put in their card details to pay 
+Author: Ana Paula Goncalves 
+Student Number:21025329-->
+{%extends "thirdbase.html"%}
+{%block head%}
+    {%block title%} {%endblock%}
+{%endblock%}
+
+{%block content%}
+<body>
+    <header>  
+        <a href="/"  target="_self"> <span class="font">HT</span> Horizon Travels </a> 
+    </header>
+
+   <!--displays what the user has selected and what card they have chosen to pay with -->
+<div class="col-12 col-m-9 col-x-12">
+    <div class="container" >
+        <h1>Booking confirmation</h1> 
+        <form action="/booking_confirm/" method=post>
+         <div class="t2"> 
+        Booking ID: {{resultset[9]}} <br/>
+        Departure City : {{resultset[1]}} <br/>
+        Departure Date : {{resultset[3]}} <br/>
+        Departure Time : {{resultset[10]}} <br/> 
+       
+            <div>Arrival City : {{resultset[2]}} <br/>  
+        Arrival Time : {{resultset[11]}} <br/>
+        Return Date : {{resultset[4]}} <br/>
+        Adult Seats : {{resultset[5]}} <br/>
+        Child Seats : {{resultset[6]}} <br/> </div>
+            </div>
+        <br/>
+        <div class="t2">Total Fare : {{resultset[7]}} <br/>
+        Payment: Card ending with ****** {{cardnumber}} <br/>
+        <input type="hidden" name="totalfare" value="{{resultset[7]}}" /> 
+        <input type="hidden" name="bookingid" value="{{resultset[8]}}" />  
+        </form> 
+        <button class="button" type="button" onclick="location.href='/';"> Continue</button> 
+    </div>
+           
+        <h1 class="heading">   
+            Hi! HolidayIn &copy; 2022 All rights reserved. Images owned by HI!.
+        </h1>
+    </div>      
+</div>
+     
+
+</body>
+{%endblock%}
+
+{%block footer%}
+{{super()}}
+{%endblock%}

@@ -1,0 +1,50 @@
+<!-- HTML file for admin home page
+Author: Ana Paula Goncalves 
+Student Number:21025329-->
+{%extends "secondbase.html"%}
+
+{%block head%}
+    {%block title%} {%endblock%}
+{%endblock%}
+
+{%block content%}
+<body>
+    <header>  
+        <a href="/"  target="_self"> <span class="font">HT</span> Horizon Travel</a> 
+    </header>
+
+   
+<div class="col-12 col-m-9 col-x-12">
+    <div class="container" >
+        <img src="{{url_for('static', filename='4thimage.jpeg')}}" alt="Paris">
+<!--display buttons with the actions that the admin can take-->
+<div class="box">
+    <h1 style='color:royalblue;'>Welcome {{username}}.</h1>        
+
+    For example admin features are (functionality to be added):<br/> 
+    <button class="button" type="button" onclick="location.href='/pricerec/';">Edit Prices</button>
+    <button class="button" type="button" onclick="location.href='/journeyrecord/';">Edit Journey</button>
+    <button class="button" type="button" onclick="location.href='/userrec/';">Edit User details</button>
+    <button class="button" type="button" onclick="location.href='/generateadminreport';">Generate reports</button> </br>
+</br>
+<div class="t2">
+    <button class="button" type="button" onclick="location.href='/updatePassword';"> Update Password</button>  
+    <!--log out button-->
+    <a class="button" href='/logout/'>Logout</a> </br> 
+</div>
+</div>
+
+<h1 class="heading">   
+    Hi! HolidayIn &copy; 2022 All rights reserved. Images owned by HI!.
+    </h1>
+</div>      
+</div>
+
+</div>  
+
+</body>
+{%endblock%}
+
+{%block footer%}
+{{super()}}
+{%endblock%}

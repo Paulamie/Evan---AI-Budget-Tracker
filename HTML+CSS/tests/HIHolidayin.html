@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html> 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style> 
+        .tudo {
+            width: 100%;
+            padding: 0px;
+            border: 0px;
+            margin: 0px;
+            
+        }
+        *{box-sizing: border-box;}
+        .header {
+            width: 1425px;
+            border: 1px;
+            padding: 10px;
+            margin: 0;
+            text-align: left;
+            font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color:white;
+            background-color:royalblue;
+            position: top fixed;
+            font-size:larger;
+            font-weight: bolder;
+            
+        }
+        .heading {
+            font-family:Arial, Helvetica, sans-serif;
+            color: black;
+            font-weight:lighter;
+            font-size: large;
+        }
+        .row::after {
+            content: "";
+            clear:both;
+            display: table;
+        }
+
+        [class*="col-"]{
+            float:left;
+            padding: 10px;
+            border: 1px ;
+        }
+    
+        .body {
+            content:"\00a9 me";
+        }
+        
+        .topnav a {
+            display: block;
+            display: table;
+            color: midnightblue;
+            text-align: center;
+            padding: 10px;
+            text-decoration: none;
+            border: 0.5px solid black;
+            background-color: royalblue;
+            width: 100%;
+           
+            
+        }
+        
+        /*links - change color on hover*/
+        .topnav a:hover {
+            background-color:midnightblue;
+            color:white;
+            
+        }
+        
+    
+        .font {
+            color:midnightblue;
+        }
+        
+        
+        img {
+            width: 100%;
+           
+            /*border: 1px solid #ddd;
+            padding: 1px;
+            width: 1173px;
+            height: 500px;*/
+          }
+         
+        .box {
+            width: 100%;
+            border: 1px solid royalblue;
+            padding: 5px;
+            margin: 0px;
+            text-align:center;
+            outline-style: inset;
+            outline-color: midnightblue;
+            
+        }
+
+        .button {
+            background-color: midnightblue;
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            transition-duration: 0.4s;
+          }
+          
+          .button:hover {
+            background-color: royalblue; 
+            color: white;
+          }
+        
+
+        
+        
+        .footer {
+            width: 1425px;;
+            border: 1px;
+            padding: 15px;
+            text-align: left;
+            position:fixed;
+            bottom:0px;
+            background-color: royalblue;
+        
+        }
+       /* This is mobile first approach */
+/* For mobile phones: */
+[class*="col-"] {
+    width: 100%;
+}
+
+/* Small devices (portrait tablets and large phones, 600px and up) */
+@media only screen and (min-width: 400px) {
+    /* For mobiles: */
+    .col-x-1 {width: 8.33%;}
+    .col-x-2 {width: 16.66%;}
+    .col-x-3 {width: 25%;}
+    .col-x-4 {width: 33.33%;}
+    .col-x-5 {width: 41.66%;}
+    .col-x-6 {width: 50%;}
+    .col-x-7 {width: 58.33%;}
+    .col-x-8 {width: 66.66%;}
+    .col-x-9 {width: 75%;}
+    .col-x-10 {width: 83.33%;}
+    .col-x-11 {width: 91.66%;}
+    .col-x-12 {width: 100%;}
+}
+
+/* Medium devices (landscape tablets, 768px and up) */
+@media only screen and (min-width: 700px) {
+    /* For tablets: */
+    .col-m-1 {width: 8.33%;}
+    .col-m-2 {width: 16.66%;}
+    .col-m-3 {width: 25%;}
+    .col-m-4 {width: 33.33%;}
+    .col-m-5 {width: 41.66%;}
+    .col-m-6 {width: 50%;}
+    .col-m-7 {width: 58.33%;}
+    .col-m-8 {width: 66.66%;}
+    .col-m-9 {width: 75%;}
+    .col-m-10 {width: 83.33%;}
+    .col-m-11 {width: 91.66%;}
+    .col-m-12 {width: 100%;}
+}
+@media only screen and (min-width: 900px) {
+    /* For desktop: */
+    .col-1 {width: 8.33%;}
+    .col-2 {width: 16.66%;}
+    .col-3 {width: 25%;}
+    .col-4 {width: 33.33%;}
+    .col-5 {width: 41.66%;}
+    .col-6 {width: 50%;}
+    .col-7 {width: 58.33%;}
+    .col-8 {width: 66.66%;}
+    .col-9 {width: 75%;}
+    .col-10 {width: 83.33%;}
+    .col-11 {width: 91.66%;}
+    .col-12 {width: 100%;}
+}
+
+              
+        
+        
+    </style>  
+<div class="tudo">
+    <head> 
+
+    </head>
+    <body>
+
+        <div class= "header" >
+           <span class="font">HI!</span> Holiday In 
+        </div>
+ <div class="row"></div>       
+<div class="col-3 col-m-3 col-x-12">
+        <div class="topnav">
+            <a href="#"> basket </a> <!-- i'm not sure if we should keep this button in or change to something else-->
+        </div>  
+        
+        <div class="topnav"> <!-- edit all of this pages to make them 'visually' able to do what they are meant to do. responsice?-->   
+                <a href = "myAccount.html" >My Account </a>
+               <!-- <a href="viewBookings.html"> View Bookings </a> --> <!-- i believe that this should be added inside of my account-->
+                <a href="privacyPage.html">Privacy Statement</a>
+                <a href="Cookies.html">Cookies Policy  </a>
+        </div>
+
+</div>
+       
+<div class="col-9 col-m-9 col-x-12">
+        <div >
+             <img src="second.jpeg" alt="train">  
+        </div>
+
+        <div class="box">
+            <h1>Buy your tickts today</h1> <!-- make sure to add 'city' and 'number of panssengers'-->
+
+            <form action="/action_page.php"> <!-- forgot to add destination -->
+              <label for="departing">departing from:</label> <!-- figure out a way of adding the calendar to these-->
+              <input type="text" id="departing" name="departing"><br><br>
+              <label for="returnig">returning on:</label>
+              <input type="text" id="returning" name="returning"><br><br>
+               <input type="submit" class= "button" value="Show Prices">
+            </form>
+            <!-- add a feature that will show the customer the price of their joruney. this is will probably be a second page that will open
+            after they click the button 'show prices'-->
+            
+            <p>Click the "Submit" button and the form-data will be sent to a page on the 
+            server called "action_page.php".</p>
+        
+        </div>
+    
+    <h1 class="heading">   
+    Hi! HolidayIn &copy; 2022 All rights reserved. Images owned by HI!.
+    </h1>
+    
+
+</div>        
+        </div>
+            </div>
+        
+        
+       
+
+
+        <div class="footer">
+            Thank you for visiting our website! hope you have a lovely holiday.
+        </div>
+    
+    </body>
+</div>
+</html>

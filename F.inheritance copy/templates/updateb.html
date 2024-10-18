@@ -1,0 +1,58 @@
+<!-- HTML file, standar user features - user can update their booking 
+Author: Ana Paula Goncalves 
+Student Number:21025329-->
+{%extends "secondbase.html"%}
+
+{%block head%}
+    {%block title%} {%endblock%}
+{%endblock%}
+
+{%block content%}
+<body>
+    <header>  
+        <a href="/"  target="_self"> <span class="font">HT</span> Horizon Travel</a> 
+    </header>
+
+   
+<div class="col-12 col-m-9 col-x-12">
+    <div class="container" >
+        <img src="{{url_for('static', filename='4thimage.jpeg')}}" alt="Paris">
+  
+
+    <div class="box">
+        <h1 style='color:royalblue;'>Welcome {{username}}.</h1>        
+    
+        <span class="heading"> Edit your Booking </span>
+        <p style="color:brown;">{{error}}</p>
+        <form action="/editbooking/" method=post> 
+          <label for="bookingid">Booking ID:</label> 
+          <input type="text" id="bookingid" name="bookingid" value="{{request.form.bookingid}}"></br></br>
+          <label for="departure">Edit departure Date:</label> 
+          <input type="date" id="departure" name="departure" value="{{request.form.departure}}">
+          <label for="returning">edit return:</label>
+          <input type="date" id="returning" name="returning" value="{{request.form.returning}}"><br><br>
+          <label for="NoPassengers">Edit Number of Passengers:</label>
+          <input type="text" id="NoPassengers" name="NoPassengers" value="{{request.form.NoPassengers}}">
+          <button class="button" href="{{ url_for('newBookings')}}" class= "button" value="Show Prices"> Edit Bookings </button>
+                
+        </form>
+
+        <p>Click the "Edit Booking" button to edit your booking.</p>
+        <p> Please note: if you wish to edit your destination you'll have to cancel it and book it again.</p>
+
+        <h1 class="heading">   
+            Hi! HolidayIn &copy; 2022 All rights reserved. Images owned by HI!.
+            </h1>
+    </div>      
+</div>
+
+</div>        
+    
+        
+
+</body>
+{%endblock%}
+
+{%block footer%}
+{{super()}}
+{%endblock%}

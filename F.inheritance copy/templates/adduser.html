@@ -1,0 +1,56 @@
+<!-- HTML file for admin to add new users 
+Author: Ana Paula Goncalves 
+Student Number:21025329-->
+{%extends "secondbase.html"%}
+
+{%block head%}
+    {%block title%} {%endblock%}
+{%endblock%}
+
+{%block content%}
+<body>
+    <header>  
+        <a href="/"  target="_self"> <span class="font">HT</span> Horizon Travels</a> 
+    </header>
+
+   
+<div class="col-12 col-m-9 col-x-12">
+    <div class="container" >
+        <img src="{{url_for('static', filename='4thimage.jpeg')}}" alt="Paris">
+<!--prompts the admin to add all the required details to add an user-->
+<div class="box">
+    <h1 style='color:royalblue;'>Welcome.</h1>        
+    
+    <span class="heading"> Add new User </span>
+    <p style="color:red;">{{error}}</p>
+    <form action="/adduser" method=post> 
+        <label for="username">User username:</label>
+        <input type="text" name="username"value="{{request.form.username}}">
+    </br>
+        <label for="email">User email:</label>
+        <input type="text" name="email" value="{{request.form.email}}"> 
+    </br>
+        <label for="password">password:</label>
+        <input type="password" name="password" value="{{request.form.password}}"> 
+    </br>
+        <label for="usertype">User Type:</label>
+        <input type="text" name="usertype" value="{{request.form.usertype}}">  
+    </br>
+        <input type="submit" class= "button" value="Add">
+    </form>
+</br>
+<!--gives the option to go back to the admin home page-->
+<button class="button" href='/adminfeatures/'> Go to Admin Page</button>
+</div>
+
+</div>      
+</div>
+
+</div>  
+
+</body>
+{%endblock%}
+
+{%block footer%}
+{{super()}}
+{%endblock%}

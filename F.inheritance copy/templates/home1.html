@@ -1,0 +1,151 @@
+<!-- HTML file, home page. access to cookies page, privacy statement page, my account page and start booking process
+Author: Ana Paula Goncalves 
+Student Number:21025329-->
+
+<!DOCTYPE html>
+<html>
+  <head>
+    {% extends "base.html" %}
+
+
+{%block head %}
+    {%block title%} {%endblock%}
+{%endblock%}
+  </head>
+  <body>
+
+{%block content%}
+<div class= "header" >
+    <span class="font">HT</span> Horizon Travels
+ </div>
+<div class="row"></div>    
+<div class="col-3 col-m-3 col-x-12">
+ <!--button to go to the following pages -->
+ <div class="topnav">   
+        <a href = "{{ url_for('myAccount') }}">My Account </a>
+        <a href= "{{ url_for ('privacyPage') }}">Privacy Statement</a>
+        <a href= " {{url_for('Cookies') }}">Cookies Policy  </a>
+         
+ </div>
+
+ <div class = "ad">
+    <img src="{{url_for('static', filename='firstImage.jpeg')}}" alt="Paris">
+ </div>
+</div>
+
+<div class="col-9 col-m-9 col-x-12">
+ <div >
+    <img src="{{url_for('static', filename='second.jpeg')}}" alt="Paris">  
+ </div>
+ 
+ <!-- starts booking process -->
+ <div class="box">
+  <!--JavaScript-->
+ <script>
+    function getarrivalcity(deptcity)    
+    {
+          var req = new XMLHttpRequest();        
+          arrivalslist = document.getElementById('arrivalslist');        
+          
+          req.onreadystatechange = function(){
+              if (req.readyState == 4){
+                  if (req.status != 200){
+                      //error handling code here
+                  }
+                  else{
+                      var response = JSON.parse(req.responseText);                   
+                      //document.getElementById('myDiv').innerHTML = response.username
+                      var size = response.size;                   
+                      //alert(response.returncities[0]);
+                      for (var x=0; x < arrivalslist.length; x++){
+                          arrivalslist.remove(x);                        
+                      }
+                      
+                      for (var i=0; i < size; i++){  
+  
+                              arrivalslist.add(new Option(response.returncities[i], response.returncities[i]));    
+                      }
+                         // var option = document.createElement("Option");
+                          //option.text = response.returncities;
+                          //arrivalslist.add(option);
+                  }
+              }
+          }
+          req.open('GET', '/returncity/?q='+deptcity);
+          req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");   
+          req.send(); 
+          return false;
+      }
+
+      function checkDateValidity() {
+        const currentDate = new Date();
+        const maxDate = new Date();
+        maxDate.setMonth(currentDate.getMonth() + 3); // Set the maximum date to 3 months from today
+        const selectedDate = new Date(document.getElementById("outdate").value);
+        const dayOfWeek = selectedDate.getDay();
+      
+        if (dayOfWeek === 0 || selectedDate < currentDate || selectedDate > maxDate) {
+          document.getElementById("outdate").value = "";
+          document.getElementById("returndate").value = "";
+          alert("Please select a valid date (Monday to Saturday, within the next 3 months)");
+        } else {
+          const outdate = document.getElementById("outdate");
+          const returndate = document.getElementById("returndate");
+          outdate.removeAttribute("disabled");
+          returndate.removeAttribute("disabled");
+        }
+      }
+    </script>
+  </head>
+  <!--prompt user to enter/ select details of their booking-->
+  <h1> Buy tickets </h1>
+    <form action="/prices/" method=post> 
+        Departure City: 
+        <select name="departureslist" onchange="getarrivalcity(this.value)">
+        {% for departure in departurelist %}
+              <option value="{{departure}}"> {{departure}} </option>	    
+          {% endfor %} 
+        </select>       
+        <br />
+        Arrival City:
+        <select id="arrivalslist" name="arrivalslist">            
+        
+        </select>
+        <br/>
+        Outgoing Date:
+        <input type="date" name="outdate" id="outdate" onblur="checkDateValidity()" required/>
+        <br/>
+        Return Date:
+        <input type="date" name="returndate" id="returndate" onblur="checkDateValidity()" required/>
+        <br/>
+        Adult Seats:
+        <input type="number" name="adultseats" id="adultseats" required />
+        <br/>
+        Child Seats:
+        <input type="number" name="childseats" id="childseats" value=0 />
+        <br/>  
+        Economy <input type="radio" name="classes" id="classes" value="Economy" required /> Business <input type="radio" name="classes" id="classes" value=""required />
+        <br/>
+        <input class ="button"type="submit" value="Show Prices">
+      
+        
+      </form>  
+     <p>Click the "Show Prices" button and the prices for your travel will be displayed.</p>
+    </div>
+ 
+ </div>
+
+<h1 class="heading">   
+Hi! HolidayIn &copy; 2022 All rights reserved. Images owned by HI!.
+</h1>
+
+</div>        
+ </div>
+     </div>
+{%endblock%}
+    </body>
+{%block footer%}
+<div class = "fixedF">
+    Thank you for visiting our website! we hope you have a lovely holiday.
+</div>
+{%endblock%}

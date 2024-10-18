@@ -1,0 +1,47 @@
+<!-- HTML file, admin feature - delete existing journey 
+Author: Ana Paula Goncalves 
+Student Number:21025329-->
+{%extends "secondbase.html"%}
+
+{%block head%}
+    {%block title%} {%endblock%}
+{%endblock%}
+
+{%block content%}
+<body>
+    <header>  
+        <a href="/"  target="_self"> <span class="font">HT</span> Horizon Travels</a> 
+    </header>
+
+   
+<div class="col-12 col-m-9 col-x-12">
+    <div class="container" >
+        <img src="{{url_for('static', filename='4thimage.jpeg')}}" alt="Paris">
+<!--deletes journey-->
+<div class="box">
+    <h1 style='color:royalblue;'>Welcome.</h1>        
+    
+    <span class="heading"> Delete an existing journey </span>
+    <p> please note: by deleting this journey you're deleting the journey route, journey times and prices set for this journey.</p>
+    <p style="color:red;">{{error}}</p>
+    <form action="/deljourney" method=post> 
+        <label for="idRoute">Journey ID:</label> 
+        <input type="text" name="idRoute" value="{{request.form.idRoute}}">
+    </br>
+        <input type="submit" class= "button" value="Delete">
+    </form>
+</br>
+<button class="button" type="button" onclick="location.href='/adminfeatures';"> Admin Home Page</button>  
+</div>
+
+</div>      
+</div>
+
+</div>  
+
+</body>
+{%endblock%}
+
+{%block footer%}
+{{super()}}
+{%endblock%}

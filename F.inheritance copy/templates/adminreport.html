@@ -1,0 +1,49 @@
+<!-- HTML file, prints the admin report. 
+Author: Ana Paula Goncalves 
+Student Number:21025329-->
+{%extends "secondbase.html"%}
+
+{%block head%}
+    {%block title%} {%endblock%}
+{%endblock%}
+
+{%block content%}
+<body>
+    <header>  
+        <a href="/"  target="_self"> <span class="font">HT</span> Horizon Travels</a> 
+    </header> 
+
+   
+<div class="col-12 col-m-9 col-x-12">
+    <div class="container" >
+        <img src="{{url_for('static', filename='4thimage.jpeg')}}" alt="Paris">
+<!--displays admin report for a specify route-->
+<div class="box">
+    <h1 style='color:royalblue;'>Welcome {{username}}.</h1>        
+    
+    <span class="heading">Insert ID for Route to Access the report </span>
+    <p style="color:red;">{{error}}</p>
+    <form action="/generateadminreport/" method=post> 
+        <label for="journeyid">Journey ID:</label> 
+        <input type="text" name="journeyid" value="{{request.form.journeyid}}">
+    </br>
+
+        <input type="submit" class= "button" value="Generate">
+    </form>
+</br>
+</br>
+<!-- gives the option to go back to the admin home page -->
+    <button class="button" type="button" onclick="location.href='/adminfeatures';"> Admin Home Page</button>  
+</div>
+ 
+</div>      
+</div>
+
+</div>  
+
+</body>
+{%endblock%}
+
+{%block footer%}
+{{super()}}
+{%endblock%}
