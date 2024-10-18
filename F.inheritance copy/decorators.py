@@ -5,11 +5,6 @@ import gc
 from functools import wraps
 import dbfunc, mysql.connector 
 from datetime import datetime
-
-
- #testing 
- 
- 
  
 app = Flask (__name__) #instantiating flask app
 app.secret_key = 'Super Secret' #secret key for sessions 
@@ -29,27 +24,33 @@ def login_required(f):
         return render_template('account2.html', error="you need to log in first")
     return wrap
 
+# My account page
+@app.route('/') #decorator/ endpoints
+# @app.route('/home/')
+def myAccount():
+    return render_template ('account2.html') 
+
 #booking process:
 #home page 
-@app.route('/') #decorator/ endpoints
-@app.route('/home/')
-def homePage():
-    conn = dbfunc.getConnection()
-    if conn != None:    #Checking if connection is None         
-        print('MySQL Connection is established')                          
-        dbcursor = conn.cursor()    #Creating cursor object            
-        dbcursor.execute('SELECT DISTINCT deptCity FROM routes;') #booking process starts here         
-        rows = dbcursor.fetchall()                                    
-        dbcursor.close()              
-        conn.close() #Connection must be 
-        cities = []
-        for city in rows:
-            city = str(city).strip("(")
-            city = str(city).strip(")")
-            city = str(city).strip(",")
-            city = str(city).strip("'")
-            cities.append(city)
-    return render_template('home1.html', departurelist=cities)
+# @app.route('/') #decorator/ endpoints
+# @app.route('/home/')
+# def homePage():
+#     conn = dbfunc.getConnection()
+#     if conn != None:    #Checking if connection is None         
+#         print('MySQL Connection is established')                          
+#         dbcursor = conn.cursor()    #Creating cursor object            
+#         dbcursor.execute('SELECT DISTINCT deptCity FROM routes;') #booking process starts here         
+#         rows = dbcursor.fetchall()                                    
+#         dbcursor.close()              
+#         conn.close() #Connection must be 
+#         cities = []
+#         for city in rows:
+#             city = str(city).strip("(")
+#             city = str(city).strip(")")
+#             city = str(city).strip(",")
+#             city = str(city).strip("'")
+#             cities.append(city)
+#     return render_template('home1.html', departurelist=cities)
 
 @app.route ('/returncity/', methods = ['POST', 'GET'])
 def ajax_returncity():   
@@ -177,10 +178,7 @@ def dumpVar():
 def homepage(usertype):
     return render_template ('account2.html', usertype=usertype)
 
-# My account page
-@app.route ('/myAccount/') #inherirance:base.html
-def myAccount():
-    return render_template ('account2.html') 
+
 
 @app.route('/register/', methods=['POST', 'GET'])
 def register():

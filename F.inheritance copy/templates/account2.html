@@ -1,22 +1,23 @@
-<!-- HTML file for the log in/ register page 
+<!-- HTML file for the log in/ register page > this will be new home page.
 Author: Ana Paula Goncalves 
 Student Number:21025329-->
 {% extends "base.html" %} <!--enhreriting the template from this html file.-->
+
 
 {%block head %}
     {%block title%}  {%endblock%}
 {%endblock%}
 
 {%block content%}
-<div class = "header">
-    <a class = "secondary" href="/" target="_self"> <span class="font">HT</span> Horizon Travels </a> 
+<div class = "">
+    <a class = "secondary" href="/" target="_self"> <span class="font">Evan</span> your personal budgeting assistant </a> 
 </div>
 
 
-<div class="t2"> 
+<div class="container"> 
 <div> 
     <!--gives the user the option to register if they don't already have an account-->
-    <span class="heading"> Register </span>
+    <span class="login-form"> Register </span>
     <p style="color:brown;">{{error}}</p>
     <form action="/register/" method="post"> 
         <label for="Username">Username:</label> 
