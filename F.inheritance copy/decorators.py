@@ -6,6 +6,11 @@ from functools import wraps
 import dbfunc, mysql.connector 
 from datetime import datetime
 
+
+ #testing 
+ 
+ 
+ 
 app = Flask (__name__) #instantiating flask app
 app.secret_key = 'Super Secret' #secret key for sessions 
 #trying to get this page to prompt you to log in and after you're logged in return you to the bookings page 
