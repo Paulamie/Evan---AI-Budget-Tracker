@@ -21,8 +21,8 @@ Student Number:21025329-->
     <div class="login"> 
         <!--gives the user the option to register if they don't already have an account-->
         <h1 style="text-align: center;">Register or Log in</h1>
+        <p style="color:red; text-align:center;">{{error}}</p>
         <div class="option">
-                <p style="color:red;">{{error}}</p>
                 <form action="/register/" method="post"> 
 
                     <label for="Username" class="font">  Username: </label> 
@@ -34,8 +34,6 @@ Student Number:21025329-->
                 </form> 
 
                 
-            
-                <p style="color:red;"> {{error}} </p>
                 <form action="/login/" method="post"> 
                 <label for="Username" class="font">Username:</label> 
                 <input class="logInput"type="text" name="username" value="{{request.form.username}}"></br>
