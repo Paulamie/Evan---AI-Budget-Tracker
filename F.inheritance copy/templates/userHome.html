@@ -1,0 +1,60 @@
+<!-- HTML file, displays the home page depending if the user is standard or admin 
+Author: Ana Paula Goncalves 
+Student Number:21025329-->
+
+{%extends "base2.html"%}
+
+{%block head %}
+    {%block title%} 
+    {{super()}}
+    {%endblock%}
+{%endblock%}
+
+{%block content%}
+<body>    
+<div class="col-12 col-m-9 col-x-12">
+
+    <div class="tab">   
+        <button type="button" onclick="location.href='/editbooking/';"> My account</button> <!--change the page that this goes to - at the moment it doesn't go anywhere
+                                                                                                in this page the user should be able to link their bank account-->
+        <button type="button" onclick="location.href='/';"> edit Budget</button> <!-- this will allow the user to edit their income/ expenses.-->
+        <button type="button" onclick="location.href='/';"> create a new Budget</button>
+        <button type="button" onclick="location.href='/';"> Your Patterns</button> <!-- this will show their patterns in spendings, savings etc.-->
+        <button type="button" onclick="location.href='/';"> Calendar View</button> <!-- this will allow the user to view their current payment dates here - add a button so the user can edit billing dates-->
+        <button type="button" onclick="location.href='/';"> Investments Tracking</button> <!-- this is a possible future implementation for investement-->
+        <button type="button" onclick="location.href='/';"> Chat to Evan</button> <!-- AI assistant.-->
+        <button type="button" onclick="location.href='/privacyStatement/';"> Privacy </button>
+        <button type="button" onclick="location.href='/cookies/';"> Cookies</button>
+        <button type="button" onclick="location.href='/logout/';"> Logout </button> 
+       
+         
+    </div>
+    
+        <h1 class="font"> Welcome {{username}}!</h1>
+        <p> in the rest of this we should be able to provide the user with a brief view of their current budget</p>
+        <h2> current income: £xxxx </br>
+            current expenses:£ xxxx </br>
+            current savings: £ xxxx </br> 
+            daily budget: £ xxxx (how much you can spend today) </br>
+            possible graph to the side (right) </h2>
+        
+
+        {% if usertype == 'admin' %} 
+            <div class="t2"> <button class="logButton" type="button" onclick="location.href='/adminfeatures/';">Admin Features</button>
+                <a class="button" href='/logout/'> Logout </a> </br> </div>
+        {% endif %}
+
+        {% if usertype == 'standard' %} 
+           <!-- add the dashboard features here-->
+        {% endif %}        
+
+    </div>      
+</div>
+</div>  
+</div>
+</body>
+{%endblock%}
+
+{%block footer%}
+{{super()}}
+{%endblock%}

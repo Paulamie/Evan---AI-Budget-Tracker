@@ -266,7 +266,7 @@ def login():
                                 session['username'] = request.form['username']
                                 session['usertype'] = str(data[1])                          
                                 print("You are now logged in")                                
-                                return render_template('userresources.html', \
+                                return render_template('userHome.html', \
                                     username=username, data='this is user specific data',\
                                          usertype=session['usertype'])
                             else:
@@ -815,7 +815,7 @@ def generate_user_record():
 
 
 #update bookings details from the user's perspective
-@app.route('/editbooking/', methods = ["POST", "GET"])
+@app.route('/editbooking', methods = ["POST", "GET"])
 @login_required
 @standard_user_required
 def edit_booking():
