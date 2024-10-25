@@ -1,39 +1,35 @@
 <!-- HTML file, displays the home page depending if the user is standard or admin 
 Author: Ana Paula Goncalves 
-Student Number:21025329-->{%extends "secondbase.html"%}
+Student Number:21025329-->
 
-{%block head%}
-    {%block title%} {%endblock%}
+{%extends "base.html"%}
+
+{%block head %}
+    {%block title%} 
+    {{super()}}
+    {%endblock%}
 {%endblock%}
 
 {%block content%}
 <body>
-    <header>  
-        <a href="/"  target="_self"> <span class="font">HT</span> Horizon Travel</a> 
-    </header>
 
-
-    
 <!--div class="div1"-->   
 <div class="col-12 col-m-9 col-x-12">
-    <img src="{{url_for('static', filename='4thimage.jpeg')}}" alt="Paris">
+    
 
-    <div class="box">
-        <h1 style='color:royalblue;'>Welcome {{username}}.</h1>  <br/>
+    <div class="container">
+        <h1 class="font"> Welcome {{username}}.</h1>  <br/>
         data: {{data}} <br/>  
         {% if usertype == 'admin' %} 
-            <div class="t2"> <button class="button" type="button" onclick="location.href='/adminfeatures/';">Admin Features</button>
+            <div class="t2"> <button class="logButton" type="button" onclick="location.href='/adminfeatures/';">Admin Features</button>
                 <a class="button" href='/logout/'> Logout </a> </br> </div>
         {% endif %}
         {% if usertype == 'standard' %} 
-            <div class="t2"> <button class="button"  type="button" onclick="location.href='/userfeatures/';">User Features</button>
-                <a class="button" href='/logout/'> Logout </a> </br> </div>
+            <div> <button class="logButton"  type="button" onclick="location.href='/userfeatures/';">My account</button>
+                <a class="logButton" href='/logout/'> Logout </a> </br> 
+            </div>
         {% endif %}        
 
-
-        <h1 class="heading">   
-            Hi! HolidayIn &copy; 2022 All rights reserved. Images owned by HI!.
-        </h1>
     </div>      
 <!--/div-->
 

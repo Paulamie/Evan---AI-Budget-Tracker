@@ -195,16 +195,16 @@ def register():
                         print('MySQL Connection is established')                          
                         dbcursor = conn.cursor()    #Creating cursor object 
                         #here we should check if username / email already exists                                                           
-                        password = sha256_crypt.hash((str(password)))           
+                        password = sha256_crypt.hash((str(password)))          
                         Verify_Query = "SELECT * FROM users WHERE username = %s;"
                         dbcursor.execute(Verify_Query,(username,))
-                        rows = dbcursor.fetchall()           
+                        rows = dbcursor.fetchall() 
                         if dbcursor.rowcount > 0:   #this means there is a user with same name
                             print('username already taken, please choose another')
                             error = "User name already taken, please choose another"
                             return render_template("account2.html", error=error)    
-                        else:   #this means we can add new user             
-                            dbcursor.execute("INSERT INTO users (username, password_hash VALUES (%s, %s)", (username, password))                
+                        else:   #this means we can add new user            
+                            dbcursor.execute("INSERT INTO users (username, password_hash) VALUES (%s, %s)", (username, password))                
                             conn.commit()  #saves data in database              
                             print("Thanks for registering!")
                             dbcursor.close()
@@ -309,7 +309,7 @@ def logout():
     session.clear()    #clears session variables
     print("You have been logged out!")
     gc.collect()
-    return render_template('home1.html', optionalmessage='You have been logged out')
+    return render_template('account2.html', optionalmessage='You have been logged out')
 
 #/userfeatures is loaded for standard users
 @app.route('/userfeatures/')
