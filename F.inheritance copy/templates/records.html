@@ -1,45 +1,46 @@
-<!-- HTML file, admin features 
+<!-- HTML file, standard user features - this is where the user will be able to create a new budget.
 Author: Ana Paula Goncalves 
 Student Number:21025329-->
-{%extends "secondbase.html"%}
+{%extends "base2.html"%}
 
-{%block head%}
-    {%block title%} {%endblock%}
+{%block head %}
+    {%block title%} 
+    {{super()}}
+    {%endblock%}
 {%endblock%}
 
 {%block content%}
 <body>
-    <header>  
-        <a href="/"  target="_self"> <span class="font">HT</span> Horizon Travel</a> 
-    </header>
-
-   
 <div class="col-12 col-m-9 col-x-12">
-    <div class="container" >
-        <img src="{{url_for('static', filename='4thimage.jpeg')}}" alt="Paris">
+    <div class="tab">   
+        <button type="button" onclick="location.href='/userhome/';"> Home Page</button> <!--change the page that this goes to - at the moment it doesn't go anywhere
+                                                                                                in this page the user should be able to link their bank account-->
+        <button type="button" onclick="location.href='/';"> edit Budget</button> <!-- this will allow the user to edit their income/ expenses.-->
+        <button type="button" onclick="location.href='/journeyrecord/';"> create a new Budget</button> <!-- this button allows the user to create a new budget-->
+        <button type="button" onclick="location.href='/';"> Your Patterns</button> <!-- this will show their patterns in spendings, savings etc.-->
+        <button type="button" onclick="location.href='/';"> Calendar View</button> <!-- this will allow the user to view their current payment dates here - add a button so the user can edit billing dates-->
+        <button type="button" onclick="location.href='/';"> Investments Tracking</button> <!-- this is a possible future implementation for investement-->
+        <button type="button" onclick="location.href='/';"> Chat to Evan</button> <!-- AI assistant.-->
+        <button type="button" onclick="location.href='/privacyStatement/';"> Privacy </button>
+        <button type="button" onclick="location.href='/cookies/';"> Cookies</button>
+        <button type="button" onclick="location.href='/logout/';"> Logout </button> 
+    </div>
 
-    <div class="box">
-        <h1 style='color:royalblue;'>Hello {{username}}, what would you like to do today?</h1>        
-        <div class="t3">
+    <h1 class="font">Hello{{username}}, Ready to Create your Budget?</h1>        
+    <div class="t3">
         <button class="button" type="button" onclick="location.href='/updatejourney';">update journey</button>
         <button class="button" type="button" onclick="location.href='/deljourney';">delete journey</button>
         <button class="button" type="button" onclick="location.href='/addjourney';">add journey</button>
-        </div>
+    </div>
     
-    </br><!-- what should be in this report?-->
+    </br>
     <div class="t2">
         <button class="button" type="button" onclick="location.href='/adminfeatures';"> Admin Home Page</button>  
         <button class="button" href='/logout/'> Logout </button> </br> 
     </div>
-    </div>
 
-<h1 class="heading">   
-    Hi! HolidayIn &copy; 2022 All rights reserved. Images owned by HI!.
-    </h1>
 </div>      
-</div>
 
-</div>  
 
 </body>
 {%endblock%}
