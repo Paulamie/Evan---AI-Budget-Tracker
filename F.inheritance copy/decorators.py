@@ -1,4 +1,4 @@
-from flask import Flask, request, session, render_template, url_for, jsonify, redirect
+from flask import Flask, request, session, render_template, url_for, jsonify, redirect, flash
 from passlib.hash import sha256_crypt
 import hashlib
 import gc
@@ -14,12 +14,9 @@ app.secret_key = 'Super Secret' #secret key for sessions
 def login_required(f):
     @wraps(f)
     def wrap(*args, **kwargs):
-        print("running")
         if 'logged_in' in session:
-            print("test 1")
             return f(*args, **kwargs)
         else: 
-            print ("test 2")
             print("you need to log in first")
         return render_template('account2.html', error="you need to log in first")
     return wrap
@@ -204,319 +201,192 @@ def admin_features():
              message='Admin data from app and admin features can go here ...')
 
     
-#the page where admin can choose to add, delete or update a journey, price or user records.
-@app.route('/journeyrecord/')
-def records():
-    print('create / amend records / delete records')
-    print ('Welcome ', session['username'], ' as ', session['usertype'])
-    return render_template('records.html', user=session['username'])
 
-#admin update a journey 
-@app.route('/updatejourney', methods = ["POST", "GET"])
+@app.route('/createBudget/', methods=['GET', 'POST'])
 @login_required
-@admin_required
-def update_journey():
-    error = ''
-    print('update journey start')
-    try:
-        if request.method == "POST": 
-            print('test1')      
-            idroute = request.form['journeyid']		
-            departcity = request.form['deptcity']
-            arrivalcity = request.form['arrivcity']
-            depttime= request.form['depttime']  
-            arrivtime = request.form['arrivtime']    
-            stFares = request.form ['stFares']   
-            classes = request.form ['classes']           
-            print ('test2')  #couldn't get to this point. Error message display: 400 Bad Request: The browser (or proxy) sent a request that this server could not understand.     
-            conn = dbfunc.getConnection()
-            if conn != None:    #Checking if connection is None           
-                if conn.is_connected(): #Checking if connection is established
-                    print('MySQL Connection is established')                          
-                    dbcursor = conn.cursor()    #Creating cursor object 
-                    #here we should check if username / email already exists                                                                    
-                    Verify_Query = "SELECT * FROM routes WHERE idRoutes = %s;"
-                    dbcursor.execute(Verify_Query,(idroute,))
-                    rows = dbcursor.fetchall()           
-                    if dbcursor.rowcount <= 0:   #this means the journey id doesn't exists
-                        print('journey  do not exist')
-                        error = "journey do not exist"
-                        return render_template("journeyup.html", error=error)    
-                    else:   #this means we can update journey            
-                        dbcursor.execute("UPDATE routes SET deptCity = %s, arrivCity = %s, deptTime = %s, arrivTime = %s, stFare = %s, classes = %s WHERE idRoutes = %s ", (departcity, arrivalcity, depttime, arrivtime, stFares, classes, idroute))                
-                        conn.commit()  #saves data in database              
-                        print("Thanks for updating this journey!")
-                        dbcursor.close()
-                        conn.close()
-                        gc.collect()                        
-                        return render_template("journeyup2.html",\
-                            message='Journey updated successfully')
-                else:                        
-                        print('Connection error')
-                        return 'DB Connection Error'
-            else:                    
-                    print('Connection error')
-                    return 'DB Connection Error'
-        else:            
-            return render_template("journeyup.html", error=error)        
-    except Exception as e:                
-        return render_template("journeyup.html", error=e) 
+def create_budget():
+    username = session['username']
+    conn = dbfunc.getConnection()
 
-#admin adds journey 
-@app.route('/addjourney', methods = ["POST", "GET"])
-@login_required
-@admin_required
-def add_journey():
-    error = ''
-    print('add journey start')
-    try:
-        if request.method == "POST": 
-            print('test1')    
-            idroute = request.form['journeyid']		
-            departcity = request.form['deptcity']
-            arrivalcity = request.form['arrivcity']
-            depttime= request.form['depttime']  
-            arrivtime = request.form['arrivtime'] 
-            stFares = request.form ['stFares']   
-            classes = request.form ['classes']       
-            print ('test2')  #can't get to this function: 400 Bad Request: The browser (or proxy) sent a request that this server could not understand.
-            conn = dbfunc.getConnection()
-            if conn != None:    #Checking if connection is None           
-                if conn.is_connected(): #Checking if connection is established
-                    print('MySQL Connection is established')                          
-                    dbcursor = conn.cursor()    #Creating cursor object 
-                    #here we should check if username / email already exists                                                                    
-                    Verify_Query = "SELECT * FROM routes WHERE idRoutes = %s;"
-                    dbcursor.execute(Verify_Query,(idroute,))
-                    rows = dbcursor.fetchall()           
-                    if dbcursor.rowcount > 0:   #this means the journey id already exists
-                        print('journey already exist')
-                        error = "journey already exist"
-                        return render_template("addjourney.html", error=error)    
-                    else:   #this means we can update journey            
-                        dbcursor.execute('INSERT INTO routes (idRoutes, deptCity, deptTime, arrivCity, arrivTime, stFare, classes) VALUES (%s, %s, %s, %s, %s, %s, %s);', (idroute, departcity, depttime, arrivalcity, arrivtime, stFares, classes,)) 
-                        conn.commit()  #saves data in database              
-                        print("Thank you for adding this journey!")
-                        dbcursor.close()
-                        conn.close()
-                        gc.collect()                        
-                        return render_template("addjourney2.html",\
-                            message='Journey added successfully')
-                else:                        
-                        print('Connection error')
-                        return 'DB Connection Error'
-            else:                    
-                    print('Connection error')
-                    return 'DB Connection Error'
-        else:            
-            return render_template("addjourney.html", error=error)        
-    except Exception as e:                
-        return render_template("addjourney.html", error=e) 
+    with conn.cursor() as cursor:
+        cursor.execute("""
+            SELECT budgets.id 
+            FROM budgets
+            JOIN users ON users.username = budgets.username
+            WHERE users.username = %s;
+        """, (username,))
+        existing_budget = cursor.fetchone()
 
-
-@app.route('/deljourney', methods = ["POST", "GET"])
-@login_required
-@admin_required
-def delete_journey():
-    error = ''
-    print('delete journey start')
-    try:
-        if request.method == "POST": 
-            print('test1')    
-            idroute = request.form['idRoute']		        
-            print ('test2')  #can't get to this function: 400 Bad Request: The browser (or proxy) sent a request that this server could not understand.
-            conn = dbfunc.getConnection()
-            if conn != None:    #Checking if connection is None           
-                if conn.is_connected(): #Checking if connection is established
-                    print('MySQL Connection is established')                          
-                    dbcursor = conn.cursor()    #Creating cursor object 
-                    #here we should check if username / email already exists                                                                    
-                    Verify_Query = "SELECT * FROM routes WHERE idRoutes = %s;"
-                    dbcursor.execute(Verify_Query,(idroute,))
-                    rows = dbcursor.fetchall()           
-                    if dbcursor.rowcount == 0:   #this means the journey don't exist
-                        print('journey dont exist')
-                        error = "journey does not exist"
-                        return render_template("deljourney.html", error=error)    
-                    else:   #this means we can delete journey            
-                        dbcursor.execute("DELETE FROM routes WHERE idRoutes = %s;", (idroute,)) 
-                        conn.commit()  #saves data in database              
-                        print("journey deleted")
-                        dbcursor.close()
-                        conn.close()
-                        gc.collect()                        
-                        return render_template("deljourney2.html",\
-                            message='Journey deleted successfully')
-                else:                        
-                        print('Connection error')
-                        return 'DB Connection Error'
-            else:                    
-                    print('Connection error')
-                    return 'DB Connection Error'
-        else:            
-            return render_template("deljourney.html", error=error)        
-    except Exception as e:                
-        return render_template("deljourney.html", error=e) 
+    if existing_budget:
+        return render_template('userHome.html', error="You can only have one main budget.")
     
+    # Get budget details from form inputs directly
+    amount = request.form.get('budget[amount]')
+    name = request.form.get('budget[name]')
     
-#updates the password for the Admins
-@app.route('/updatePassword/', methods = ["POST", "GET"])
-@login_required
-@admin_required
-def update_admin_password():
-    error = ''
-    print('update start')
-    try:
-        if request.method == "POST": #can't get inside tbis function for some reason
-            print('test1')
-            username = request.form['username']        
-            password = request.form['password']                 
-            if  password != None: 
-                print ('test2')          
-                conn = dbfunc.getConnection()
-                if conn != None:    #Checking if connection is None           
-                    if conn.is_connected(): #Checking if connection is established
-                        print('MySQL Connection is established')                          
-                        dbcursor = conn.cursor()    #Creating cursor object 
-                        #here we should check if username exists                                                         
-                        password = sha256_crypt.hash((str(password)))           
-                        Verify_Query = "SELECT * FROM users WHERE username = %s;"
-                        dbcursor.execute(Verify_Query,(username,))
-                        rows = dbcursor.fetchall()           
-                        if dbcursor.rowcount == 0:   #this means that the username doesn't exist
-                            print('username do not exist')
-                            error = "Please try again, username does not exist"
-                            return render_template("changepassword.html", error=error)    
-                        else:   #this means we can add new user             
-                            dbcursor.execute("UPDATE users SET password_hash =%s WHERE username = %s", (password, username))                
-                            conn.commit()  #saves data in database              
-                            print("Thanks for updating your password!")
-                            dbcursor.close()
-                            conn.close()
-                            gc.collect()                        
-                            return render_template("change2.html", message='Password updated successfully')
-                    else:                        
-                        print('Connection error')
-                        return 'DB Connection Error'
-                else:                    
-                    print('Connection error')
-                    return 'DB Connection Error'
-            else:                
-                print('empty parameters')
-                return render_template("changepassword.html", error=error)
-        else:            
-            return render_template("changepassword.html", error=error)        
-    except Exception as e:                
-        return render_template("changepassword.html", error=e) 
-
-
-
-#update bookings details from the user's perspective
-@app.route('/editbooking', methods = ["POST", "GET"])
-@login_required
-@standard_user_required
-def edit_booking():
-    error = ''
-    print('edit booking start')
-    try:
-        print(request.form)
-        if request.method == "POST": #can't get inside this function
-            print('test1')       
-            bookingid = request.form['bookingid']
-            departure = request.form['departure']
-            returning = request.form['returning']   
-            NoPassengers = request.form['NoPassengers']   
-                        
-            print ('test2')          
-            conn = dbfunc.getConnection()
-            if conn != None:    #Checking if connection is None           
-                if conn.is_connected(): #Checking if connection is established
-                    print('MySQL Connection is established')                          
-                    dbcursor = conn.cursor()    #Creating cursor object 
-                        #here we should check if username / email already exists                                                                 
-                    Verify_Query = "SELECT * FROM bookings WHERE idBooking = %s;"
-                    dbcursor.execute(Verify_Query,(bookingid,))
-                    rows = dbcursor.fetchall()           
-                    if dbcursor.rowcount == 0:   #this means the booking don't exist
-                        print('booking doesnt exist')
-                        error = "booking number incorrect"
-                        return render_template("updateb.html", error=error)    
-                    else:   #this means we can edit the details            
-                        dbcursor.execute("UPDATE bookings SET deptDate = %s, arrivDate = %s, noOfSeats = %s WHERE idBooking = %s", (departure, returning, NoPassengers, bookingid,))                
-                        conn.commit()  #saves data in database              
-                        print("Thanks for updating your Booking")
-                        dbcursor.close()
-                        conn.close()
-                        gc.collect()                        
-                        return render_template("updateb2.html",\
-                            message='Booking updated successfully')
-                else:                        
-                    print('Connection error')
-                    return 'DB Connection Error'
-            else:                    
-                print('Connection error')
-                return 'DB Connection Error'
-        else:                
-            print('empty parameters')
-            return render_template("updateb.html", error=error)    
-    except Exception as e:                
-        return render_template("updateb.html", error=e)  
+    if not amount or not name:
+        return render_template('records.html', error="Please provide both budget amount and name.")
     
-#update user data -> all in one page write new name, email, password and then tell the database to update details.
-@app.route('/updateInfo/', methods = ["POST", "GET"])
-@login_required
-@standard_user_required
-def update_user_data():
-    error = ''
-    print('update start')
-    try:
-        if request.method == "POST": #can't get inside this function
-            print('test1')       
-            username = request.form['username']
-            password = request.form['password']
-            email = request.form['email']                      
-            if username != None and password != None and email != None: 
-                print ('test2')          
-                conn = dbfunc.getConnection()
-                if conn != None:    #Checking if connection is None           
-                    if conn.is_connected(): #Checking if connection is established
-                        print('MySQL Connection is established')                          
-                        dbcursor = conn.cursor()    #Creating cursor object 
-                        #here we should check if username / email already exists                                                           
-                        password = sha256_crypt.hash((str(password)))           
-                        Verify_Query = "SELECT * FROM users WHERE username = %s;"
-                        dbcursor.execute(Verify_Query,(username,))
-                        rows = dbcursor.fetchall()           
-                        if dbcursor.rowcount == 0:   #this means the user don't exist
-                            print('username not found, please enter your username')
-                            error = "username not found, please enter your username"
-                            return render_template("update.html", error=error)    
-                        else:   #this means we can edit the details            
-                            dbcursor.execute("UPDATE users SET password_hash = %s, email = %s WHERE username = %s", (password, email, username))                
-                            conn.commit()  #saves data in database              
-                            print("Thanks for updating your details!")
-                            dbcursor.close()
-                            conn.close()
-                            gc.collect()                        
-                            session['logged_in'] = True     #session variables
-                            session['username'] = username
-                            session['usertype'] = 'standard'   #default all users are standard
-                            return render_template("successupdate.html",\
-                             message='User updated successfully')
-                    else:                        
-                        print('Connection error')
-                        return 'DB Connection Error'
-                else:                    
-                    print('Connection error')
-                    return 'DB Connection Error'
-            else:                
-                print('empty parameters')
-                return render_template("update.html", error=error)
-        else:            
-            return render_template("update.html", error=error)        
-    except Exception as e:                
-        return render_template("update.html", error=e)  
+    with conn.cursor() as cursor:
+        cursor.execute("""
+            INSERT INTO budgets (username, budget_amount, budget_name)
+            SELECT username, %s, %s FROM users WHERE username = %s
+        """, (amount, name, username))
+        conn.commit()
+    
+    return render_template("addvalues.html")
 
+@app.route('/addIncome', methods=['POST'])
+@login_required
+def add_income():
+    username = session['username']
+    conn = dbfunc.getConnection()
+
+    # Get income details from the form
+    income_source = request.form.get('income_source')
+    income_amount = request.form.get('income_amount')
+
+    try:
+        # Insert income into the income table
+        with conn.cursor() as cursor:
+            cursor.execute("""
+                INSERT INTO income (username, income_source, income_amount)
+                VALUES (%s, %s, %s);
+            """, (username, income_source, income_amount))
+            conn.commit()
+
+        flash("Income added successfully!")
+    except Exception as e:
+        # Handle the error (e.g., log it, flash a message, etc.)
+        flash(f"An error occurred: {str(e)}")
+    finally:
+        conn.close()  # Always close the connection
+
+    return render_template('viewBudget.html')
+
+@app.route('/addExpenses', methods=['POST'])
+@login_required
+def add_expenses():
+    username = session['username']
+    conn = dbfunc.getConnection()
+
+    # Get expense details from the form
+    expense_name = request.form.get('expense_name')
+    expense_amount = request.form.get('expense_amount')
+
+    # Insert expense into the expenses table
+    with conn.cursor() as cursor:
+        cursor.execute("""
+            INSERT INTO expenses (username, expense_name, expense_amount)
+            VALUES (%s, %s, %s);
+        """, (username, expense_name, expense_amount))
+        conn.commit()
+
+    flash("Expense added successfully!")
+    return render_template('viewBudget.html')
+
+# Add Savings to Budget
+@app.route('/addSavings', methods=['POST'])
+@login_required
+def add_savings():
+    username = session['username']
+    conn = dbfunc.getConnection()
+
+    # Get the savings details from the form
+    saving_name = request.form.get('saving_name')
+    saving_amount = request.form.get('saving_amount')
+
+    # Insert savings into the savings table
+    with conn.cursor() as cursor:
+        cursor.execute("""
+            INSERT INTO savings (username, saving_name, saving_amount)
+            VALUES (%s, %s, %s);
+        """, (username, saving_name, saving_amount))
+        conn.commit()
+
+    flash("Savings added successfully!")
+    return render_template('viewBudget.html')
+
+
+@app.route('/addvalues/', methods=['GET', 'POST'])
+@login_required
+def add_financial_entries():
+    username = session['username']
+
+    if request.method == 'POST':
+        # Determine which entry to add based on the button pressed
+        if 'add_income' in request.form:
+            return add_income()
+        elif 'add_expense' in request.form:
+            return add_expenses()
+        elif 'add_saving' in request.form:
+            return add_savings()
+
+    return render_template('addvalues.html')  # Render the form template
+
+@app.route('/view_budget')
+@login_required
+def view_budget():
+    username = session['username']
+    conn = dbfunc.getConnection()
+    print("connection established")
+
+    try:
+        # Fetch budget details
+        with conn.cursor() as cursor:
+            cursor.execute("SELECT * FROM budgets WHERE username = %s", (username,))
+            budget = cursor.fetchone()
+            print("found budget")
+
+            # Check if a budget exists
+            if not budget:
+                flash("No budget found for this user.")
+                print("there's no bduget")
+                return redirect(url_for('create_budget'))  # Redirect to budget creation if none exists
+            
+
+            # Access budget fields by index
+            budget_name = budget[2]  # Assuming budget_name is the third column
+            budget_amount = budget[3]  # Assuming budget_amount is the fourth column
+            savings = budget[4]  # Assuming savings is the fifth column
+
+            cursor.execute("SELECT * FROM income WHERE username = %s", (username,))
+            incomes = cursor.fetchall()
+            print("income")
+
+            cursor.execute("SELECT * FROM expenses WHERE username = %s", (username,))
+            expenses = cursor.fetchall()
+            print("expenses")
+
+            cursor.execute("SELECT * FROM savings WHERE username = %s", (username,))
+            savings = cursor.fetchall()
+            print("savings")
+
+        print("going to calculate")
+        # Calculate totals using the correct indices
+        # Calculate totals ensuring values are treated as numbers
+        total_income = sum(float(income[3]) for income in incomes) if incomes else 0.0  # Convert to float
+        total_expenses = sum(float(expense[3]) for expense in expenses) if expenses else 0.0  # Convert to float
+        print("calculated")
+
+    except Exception as e:
+        flash(f"An error occurred while retrieving budget data: {str(e)}")
+        return redirect(url_for('userHome'))  # Handle error appropriately
+
+    finally:
+        conn.close()  # Always close the connection
+
+    # Render the template with all required data
+    return render_template(
+        'viewBudget.html',
+        budget_name=budget_name,
+        budget_amount=budget_amount,
+        incomes=incomes,
+        expenses=expenses,
+        savings=savings,
+        total_income=total_income,
+        total_expenses=total_expenses
+    )
 
 #privacy page 
 @app.route ('/privacyStatement') #inheritance: base.html

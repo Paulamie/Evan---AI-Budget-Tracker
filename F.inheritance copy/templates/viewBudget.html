@@ -1,0 +1,159 @@
+<!-- HTML file, standard user features - this is where the user can add the details for their budget after creation
+Author: Ana Paula Goncalves 
+Student Number: 21025329 -->
+{% extends "base2.html" %}
+
+{% block head %}
+    {% block title %} 
+    {{ super() }}
+    {% endblock %}
+    <style>
+        /* Responsive table styles */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        /* Responsive button styles */
+        button {
+            padding: 10px 15px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        /* Responsive layout */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        @media (max-width: 768px) {
+            button {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h2>Your Budget Overview</h2>  
+
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <ul>
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+
+        <h3>Budget Details</h3>
+        <table>
+            <tr>
+                <td><strong>Budget Name:</strong> {{ budget_name }}</td>
+                <td><strong>Total Budget Amount:</strong> ${{ budget_amount }}</td>
+                <td><strong>Savings:</strong> ${{ savings }}</td>
+            </tr>
+        </table>
+
+        <h3>Income</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Source</th>
+                    <th>Amount</th>
+                    <th>Date Added</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for income in incomes %}
+                    <tr>
+                        <td>{{ income.income_source }}</td>
+                        <td>${{ income.income_amount }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <h3>Expenses</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Amount</th>
+                    <th>Date Added</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for expense in expenses %}
+                    <tr>
+                        <td>{{ expense.expense_name }}</td>
+                        <td>${{ expense.expense_amount }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <h3>Savings</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Amount</th>
+                    <th>Date Added</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for saving in savings %}
+                    <tr>
+                        <td>{{ saving.saving_name }}</td>
+                        <td>${{ saving.saving_amount }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <h3>Total Income:</h3>
+        <p>${{ total_income }}</p>
+
+        <h3>Total Expenses:</h3>
+        <p>${{ total_expenses }}</p>
+
+        <h3>Remaining Budget:</h3>
+        <p>${{ total_income - total_expenses }}</p>
+
+        <div>
+            <button onclick="location.href='/addIncome/'">Add Income</button>
+            <button onclick="location.href='/addExpenses/'">Add Expenses</button>
+            <button onclick="location.href='/addSavings/'">Add Savings</button>
+            <button onclick="location.href='/userhome/'">Back to Home</button>
+        </div>
+    </div>
+{% endblock %}
+
+{% block footer %}
+    {{ super() }}
+{% endblock %}
