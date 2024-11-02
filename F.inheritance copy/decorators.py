@@ -236,76 +236,96 @@ def create_budget():
     
     return render_template("addvalues.html")
 
-@app.route('/addIncome', methods=['POST'])
+@app.route('/addIncome', methods=['GET', 'POST'])
 @login_required
 def add_income():
-    username = session['username']
-    conn = dbfunc.getConnection()
+    if request.method == 'POST':
+        username = session['username']
+        conn = dbfunc.getConnection()
 
-    # Get income details from the form
-    income_source = request.form.get('income_source')
-    income_amount = request.form.get('income_amount')
+        # Get income details from the form
+        income_source = request.form.get('income_source')
+        income_amount = request.form.get('income_amount')
 
-    try:
-        # Insert income into the income table
-        with conn.cursor() as cursor:
-            cursor.execute("""
-                INSERT INTO income (username, income_source, income_amount)
-                VALUES (%s, %s, %s);
-            """, (username, income_source, income_amount))
-            conn.commit()
+        try:
+            # Insert income into the income table
+            with conn.cursor() as cursor:
+                cursor.execute("""
+                    INSERT INTO income (username, income_source, income_amount)
+                    VALUES (%s, %s, %s);
+                """, (username, income_source, income_amount))
+                conn.commit()
 
-        flash("Income added successfully!")
-    except Exception as e:
-        # Handle the error (e.g., log it, flash a message, etc.)
-        flash(f"An error occurred: {str(e)}")
-    finally:
-        conn.close()  # Always close the connection
+            flash("Income added successfully!")
+            return redirect(url_for('view_budget'))  # Redirect to the viewBudget function
+        except Exception as e:
+            # Handle the error (e.g., log it, flash a message, etc.)
+            flash(f"An error occurred: {str(e)}")
+        finally:
+            conn.close()  # Always close the connection
 
-    return render_template('viewBudget.html')
+    return render_template('addIncome.html')  # Render the income form for GET requests
 
-@app.route('/addExpenses', methods=['POST'])
+@app.route('/addExpenses', methods=['GET', 'POST'])
 @login_required
 def add_expenses():
-    username = session['username']
-    conn = dbfunc.getConnection()
+    if request.method == 'POST':
+        username = session['username']
+        conn = dbfunc.getConnection()
 
-    # Get expense details from the form
-    expense_name = request.form.get('expense_name')
-    expense_amount = request.form.get('expense_amount')
+        # Get expense details from the form
+        expense_name = request.form.get('expense_name')
+        expense_amount = request.form.get('expense_amount')
 
-    # Insert expense into the expenses table
-    with conn.cursor() as cursor:
-        cursor.execute("""
-            INSERT INTO expenses (username, expense_name, expense_amount)
-            VALUES (%s, %s, %s);
-        """, (username, expense_name, expense_amount))
-        conn.commit()
+        try:
+            # Insert expense into the expenses table
+            with conn.cursor() as cursor:
+                cursor.execute("""
+                    INSERT INTO expenses (username, expense_name, expense_amount)
+                    VALUES (%s, %s, %s);
+                """, (username, expense_name, expense_amount))
+                conn.commit()
 
-    flash("Expense added successfully!")
-    return render_template('viewBudget.html')
+            flash("Expense added successfully!")
+            return redirect(url_for('view_budget'))  # Redirect to the viewBudget function
+        except Exception as e:
+            # Handle the error (e.g., log it, flash a message, etc.)
+            flash(f"An error occurred: {str(e)}")
+        finally:
+            conn.close()  # Always close the connection
+
+    return render_template('addExpenses.html')  # Render the expenses form for GET requests
 
 # Add Savings to Budget
-@app.route('/addSavings', methods=['POST'])
+@app.route('/addSavings', methods=['GET', 'POST'])
 @login_required
 def add_savings():
-    username = session['username']
-    conn = dbfunc.getConnection()
+    if request.method == 'POST':
+        username = session['username']
+        conn = dbfunc.getConnection()
 
-    # Get the savings details from the form
-    saving_name = request.form.get('saving_name')
-    saving_amount = request.form.get('saving_amount')
+        # Get the savings details from the form
+        saving_name = request.form.get('saving_name')
+        saving_amount = request.form.get('saving_amount')
 
-    # Insert savings into the savings table
-    with conn.cursor() as cursor:
-        cursor.execute("""
-            INSERT INTO savings (username, saving_name, saving_amount)
-            VALUES (%s, %s, %s);
-        """, (username, saving_name, saving_amount))
-        conn.commit()
+        try:
+            # Insert savings into the savings table
+            with conn.cursor() as cursor:
+                cursor.execute("""
+                    INSERT INTO savings (username, saving_name, saving_amount)
+                    VALUES (%s, %s, %s);
+                """, (username, saving_name, saving_amount))
+                conn.commit()
 
-    flash("Savings added successfully!")
-    return render_template('viewBudget.html')
+            flash("Savings added successfully!")
+            return redirect(url_for('view_budget'))  # Redirect to the viewBudget function
+        except Exception as e:
+            # Handle the error (e.g., log it, flash a message, etc.)
+            flash(f"An error occurred: {str(e)}")
+        finally:
+            conn.close()  # Always close the connection
+
+    return render_template('addSavings.html')  # Render the savings form for GET requests
 
 
 @app.route('/addvalues/', methods=['GET', 'POST'])
@@ -329,44 +349,31 @@ def add_financial_entries():
 def view_budget():
     username = session['username']
     conn = dbfunc.getConnection()
-    print("connection established")
 
     try:
         # Fetch budget details
         with conn.cursor() as cursor:
             cursor.execute("SELECT * FROM budgets WHERE username = %s", (username,))
             budget = cursor.fetchone()
-            print("found budget")
 
             # Check if a budget exists
             if not budget:
                 flash("No budget found for this user.")
-                print("there's no bduget")
                 return redirect(url_for('create_budget'))  # Redirect to budget creation if none exists
-            
-
-            # Access budget fields by index
-            budget_name = budget[2]  # Assuming budget_name is the third column
-            budget_amount = budget[3]  # Assuming budget_amount is the fourth column
-            savings = budget[4]  # Assuming savings is the fifth column
 
             cursor.execute("SELECT * FROM income WHERE username = %s", (username,))
             incomes = cursor.fetchall()
-            print("income")
 
             cursor.execute("SELECT * FROM expenses WHERE username = %s", (username,))
             expenses = cursor.fetchall()
-            print("expenses")
 
             cursor.execute("SELECT * FROM savings WHERE username = %s", (username,))
             savings = cursor.fetchall()
-            print("savings")
 
-        print("going to calculate")
-        # Calculate totals using the correct indices
-        # Calculate totals ensuring values are treated as numbers
+        # Calculate totals
         total_income = sum(float(income[3]) for income in incomes) if incomes else 0.0  # Convert to float
         total_expenses = sum(float(expense[3]) for expense in expenses) if expenses else 0.0  # Convert to float
+        total_savings = sum(float(savings[3]) for savings in savings) if savings else 0.0  # Convert to float
         print("calculated")
 
     except Exception as e:
@@ -376,16 +383,24 @@ def view_budget():
     finally:
         conn.close()  # Always close the connection
 
+    # Prepare budget details
+    budget_name = budget[2]
+    budget_amount = float(budget[3])
+    
+    # Prepare savings details
+    savings_list = [{'name': saving[2], 'amount': float(saving[3])} for saving in savings]
+
     # Render the template with all required data
     return render_template(
         'viewBudget.html',
         budget_name=budget_name,
         budget_amount=budget_amount,
+        savings=savings_list,
         incomes=incomes,
         expenses=expenses,
-        savings=savings,
         total_income=total_income,
-        total_expenses=total_expenses
+        total_expenses=total_expenses,
+        total_savings=total_savings
     )
 
 #privacy page 

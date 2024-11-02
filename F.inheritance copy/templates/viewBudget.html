@@ -14,144 +14,165 @@ Student Number: 21025329 -->
             border-collapse: collapse;
             margin-bottom: 20px;
         }
-
+    
         th, td {
             padding: 12px;
             border: 1px solid #ddd;
             text-align: left;
         }
-
+    
         th {
             background-color: #f2f2f2;
         }
-
+    
         /* Responsive button styles */
         button {
             padding: 10px 15px;
             margin: 5px;
             border: none;
             border-radius: 5px;
-            background-color: #4CAF50;
+            background-color: #C8A2C8;
             color: white;
             cursor: pointer;
         }
-
+    
         button:hover {
-            background-color: #45a049;
+            background-color: #4B0082;
         }
-
+    
         /* Responsive layout */
         .container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
         }
-
+    
+        .table-container {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap; /* Ensure tables wrap on smaller screens */
+        }
+    
+        .table-wrapper {
+            flex: 1; /* Allow both tables to take equal space */
+            margin: 10px; /* Add some margin between tables */
+            min-width: 300px; /* Minimum width to avoid too narrow tables */
+            box-shadow: 0 0 10px rgba(0,0,0,0.1); /* Optional: Add shadow for better separation */
+        }
+    
+        h3 {
+            margin-top: 20px; /* Add margin above section headers */
+        }
+    
         @media (max-width: 768px) {
             button {
                 width: 100%;
                 margin-bottom: 10px;
+            }
+            .table-container {
+                flex-direction: column; /* Stack tables on smaller screens */
             }
         }
     </style>
 {% endblock %}
 
 {% block content %}
-    <div class="container">
-        <h2>Your Budget Overview</h2>  
+    <h2>Your Budget Overview</h2>  
 
-        {% with messages = get_flashed_messages() %}
-            {% if messages %}
-                <ul>
-                {% for message in messages %}
-                    <li>{{ message }}</li>
-                {% endfor %}
-                </ul>
-            {% endif %}
-        {% endwith %}
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul>
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
 
-        <h3>Budget Details</h3>
-        <table>
-            <tr>
-                <td><strong>Budget Name:</strong> {{ budget_name }}</td>
-                <td><strong>Total Budget Amount:</strong> ${{ budget_amount }}</td>
-                <td><strong>Savings:</strong> ${{ savings }}</td>
-            </tr>
-        </table>
+    <h3>Budget Details</h3>
+    <table>
+        <tr>
+            <td><strong>Budget Name:</strong> {{ budget_name }}</td>
+            <td><strong>Total Budget Amount:</strong> ${{ budget_amount }}</td>
+            <td><strong>Remaining Budget:</strong> ${{ total_income - total_expenses }}</td>
+        </tr>
+    </table>
 
-        <h3>Income</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Source</th>
-                    <th>Amount</th>
-                    <th>Date Added</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for income in incomes %}
+    <div>
+        <button onclick="location.href='/addIncome'">Add Income</button>
+        <button onclick="location.href='/addExpenses'">Add Expenses</button>
+        <button onclick="location.href='/addSavings'">Add Savings</button>
+        <button onclick="location.href='/userhome/'">Back to Home</button>
+    </div>
+
+    <div class="table-container">
+        <div class="table-wrapper">
+            <h3>Income</h3>
+            <table>
+                <thead>
                     <tr>
-                        <td>{{ income.income_source }}</td>
-                        <td>${{ income.income_amount }}</td>
+                        <th>Source</th>
+                        <th>Amount</th>
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    {% for income in incomes %}
+                        <tr>
+                            <td>{{ income[2]}}</td>
+                            <td>${{ income[3]}}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <h3>Total Income:</h3>
+            <p>${{ total_income }}</p>
+        </div>
 
-        <h3>Expenses</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Amount</th>
-                    <th>Date Added</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for expense in expenses %}
+        <div class="table-wrapper">
+            <h3>Expenses</h3>
+            <table>
+                <thead>
                     <tr>
-                        <td>{{ expense.expense_name }}</td>
-                        <td>${{ expense.expense_amount }}</td>
+                        <th>Name</th>
+                        <th>Amount</th>
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    {% for expense in expenses %}
+                        <tr>
+                            <td>{{ expense[2] }}</td>
+                            <td>${{ expense[3] }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <h3>Total Expenses:</h3>
+            <p>${{ total_expenses }}</p>
+        </div>
 
-        <h3>Savings</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Amount</th>
-                    <th>Date Added</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for saving in savings %}
+        <div class="table-wrapper">
+            <h3>Savings</h3>
+            <table>
+                <thead>
                     <tr>
-                        <td>{{ saving.saving_name }}</td>
-                        <td>${{ saving.saving_amount }}</td>
+                        <th>Name</th>
+                        <th>Amount</th>
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-
-        <h3>Total Income:</h3>
-        <p>${{ total_income }}</p>
-
-        <h3>Total Expenses:</h3>
-        <p>${{ total_expenses }}</p>
-
-        <h3>Remaining Budget:</h3>
-        <p>${{ total_income - total_expenses }}</p>
-
-        <div>
-            <button onclick="location.href='/addIncome/'">Add Income</button>
-            <button onclick="location.href='/addExpenses/'">Add Expenses</button>
-            <button onclick="location.href='/addSavings/'">Add Savings</button>
-            <button onclick="location.href='/userhome/'">Back to Home</button>
+                </thead>
+                <tbody>
+                    {% for saving in savings %}
+                        <tr>
+                            <td>{{ saving.name }}</td>
+                            <td>${{ saving.amount }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <h3>Total Savings:</h3>
+            <p>${{ total_savings }}</p> <!-- Add this if you have total savings variable -->
         </div>
     </div>
+
 {% endblock %}
 
 {% block footer %}
