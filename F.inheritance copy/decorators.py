@@ -234,7 +234,7 @@ def create_budget():
         """, (amount, name, username))
         conn.commit()
     
-    return render_template("addvalues.html")
+    return render_template("success.html")
 
 @app.route('/addIncome', methods=['GET', 'POST'])
 @login_required
@@ -328,21 +328,21 @@ def add_savings():
     return render_template('addSavings.html')  # Render the savings form for GET requests
 
 
-@app.route('/addvalues/', methods=['GET', 'POST'])
-@login_required
-def add_financial_entries():
-    username = session['username']
+# @app.route('/addvalues/', methods=['GET', 'POST'])
+# @login_required
+# def add_financial_entries():
+#     username = session['username']
 
-    if request.method == 'POST':
-        # Determine which entry to add based on the button pressed
-        if 'add_income' in request.form:
-            return add_income()
-        elif 'add_expense' in request.form:
-            return add_expenses()
-        elif 'add_saving' in request.form:
-            return add_savings()
+#     if request.method == 'POST':
+#         # Determine which entry to add based on the button pressed
+#         if 'add_income' in request.form:
+#             return add_income()
+#         elif 'add_expense' in request.form:
+#             return add_expenses()
+#         elif 'add_saving' in request.form:
+#             return add_savings()
 
-    return render_template('addvalues.html')  # Render the form template
+#     return render_template('addvalues.html')  # Render the form template
 
 @app.route('/view_budget')
 @login_required
@@ -387,8 +387,8 @@ def view_budget():
     budget_name = budget[2]
     budget_amount = float(budget[3])
     
-    # Prepare savings details
-    savings_list = [{'name': saving[2], 'amount': float(saving[3])} for saving in savings]
+    # Prepare savings details with proper keys for id, name, and amount
+    savings_list = [{'id': saving[0], 'name': saving[2], 'amount': float(saving[3])} for saving in savings]
 
     # Render the template with all required data
     return render_template(
@@ -402,6 +402,77 @@ def view_budget():
         total_expenses=total_expenses,
         total_savings=total_savings
     )
+
+@app.route('/deleteIncome/<int:income_id>', methods=['POST'])
+@login_required
+def delete_income(income_id):
+    conn = dbfunc.getConnection()
+    username = session['username']
+
+    try:
+        # Delete the income record by ID and username (ensuring username is correctly matched as a VARCHAR)
+        with conn.cursor() as cursor:
+            cursor.execute("""
+                DELETE FROM income
+                WHERE id = %s AND username = %s;
+            """, (income_id, username))
+            conn.commit()
+
+        flash("Income entry deleted successfully!")
+    except Exception as e:
+        flash(f"An error occurred: {str(e)}")
+    finally:
+        conn.close()
+
+    return redirect(url_for('view_budget'))
+
+
+@app.route('/deleteExpense/<int:expense_id>', methods=['POST'])
+@login_required
+def delete_expense(expense_id):
+    conn = dbfunc.getConnection()
+    username = session['username']
+
+    try:
+        # Delete the expense record by ID and username
+        with conn.cursor() as cursor:
+            cursor.execute("""
+                DELETE FROM expenses
+                WHERE id = %s AND username = %s;
+            """, (expense_id, username))
+            conn.commit()
+
+        flash("Expense entry deleted successfully!")
+    except Exception as e:
+        flash(f"An error occurred: {str(e)}")
+    finally:
+        conn.close()
+
+    return redirect(url_for('view_budget'))
+
+@app.route('/deleteSaving/<int:saving_id>', methods=['POST'])
+@login_required
+def delete_saving(saving_id):
+    conn = dbfunc.getConnection()
+    username = session['username']
+
+    try:
+        # Delete the saving record by ID and username
+        with conn.cursor() as cursor:
+            cursor.execute("""
+                DELETE FROM savings
+                WHERE id = %s AND username = %s;
+            """, (saving_id, username))
+            conn.commit()
+
+        flash("Saving entry deleted successfully!")
+    except Exception as e:
+        flash(f"An error occurred: {str(e)}")
+    finally:
+        conn.close()
+
+    return redirect(url_for('view_budget'))
+
 
 #privacy page 
 @app.route ('/privacyStatement') #inheritance: base.html

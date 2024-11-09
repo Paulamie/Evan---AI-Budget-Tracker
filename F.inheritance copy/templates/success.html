@@ -1,0 +1,91 @@
+{% extends "base2.html" %}
+
+{% block head %}
+    {% block title %} 
+    {{ super() }}
+    {% endblock %}
+    <style>
+        /* Container for the form */
+        .form-container {
+            max-width: 600px; /* Limit the width for better proportion */
+            margin: 0 auto; /* Center the form */
+            padding: 20px; /* Add some padding around the form */
+            border: 1px solid #ddd; /* Optional: Add border for better visibility */
+            border-radius: 8px; /* Rounded corners */
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Optional: Shadow for depth */
+        }
+
+        /* Style for input fields */
+        input[type="text"],
+        input[type="number"] {
+            width: 100%; /* Make input fields take full width */
+            padding: 10px; /* Add padding inside the inputs */
+            margin: 10px 0; /* Space between inputs */
+            border: 1px solid #ccc; /* Border styling */
+            border-radius: 4px; /* Rounded corners */
+            box-sizing: border-box; /* Include padding and border in width */
+        }
+
+        /* Style for buttons */
+        button {
+            width: 100%; /* Full width for buttons */
+            padding: 10px; /* Padding for buttons */
+            background-color: #C8A2C8; /* Button color */
+            color: white; /* Text color */
+            border: none; /* No border */
+            border-radius: 5px; /* Rounded corners */
+            cursor: pointer; /* Pointer on hover */
+            margin: 10px 0; /* Space between buttons */
+        }
+
+        button:hover {
+            background-color: #4B0082; /* Darker shade on hover */
+        }
+
+        /* Error message style */
+        .error-message {
+            color: red; /* Error message color */
+            margin-top: 10px; /* Space above error message */
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<body>
+    <div class="col-12 col-m-9 col-x-12">
+        <div class="tab">   
+            <button type="button" onclick="location.href='/userhome/';"> Home Page</button>
+            <button type="button" onclick="location.href='/editbooking/';"> My account</button> 
+            <button type="button" onclick="location.href='/view_budget';"> View Budget</button> <!-- this will allow the user to edit their income/ expenses.-->
+            <button type="button" onclick="location.href='/';"> Your Patterns</button> <!-- this will show their patterns in spendings, savings etc.-->
+            <button type="button" onclick="location.href='/';"> Calendar View</button> <!-- this will allow the user to view their current payment dates here - add a button so the user can edit billing dates-->
+            <button type="button" onclick="location.href='/';"> Investments Tracking</button> <!-- this is a possible future implementation for investement-->
+            <button type="button" onclick="location.href='/';"> Chat to Evan</button> <!-- AI assistant.-->
+            <button type="button" onclick="location.href='/privacyStatement/';"> Privacy </button>
+            <button type="button" onclick="location.href='/cookies/';"> Cookies</button>
+            <button type="button" onclick="location.href='/logout/';"> Logout </button> 
+        </div>
+
+        <h2 class="font">Budget Created!!!</h2> 
+
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <ul>
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+
+        <div class="form-container">
+            <p> You have successfully created your budget! </p>
+                <p>  Click 'view budget' to view it</p>
+        </div>
+    </div>      
+</body>
+{% endblock %}
+
+{% block footer %}
+    {{ super() }}
+{% endblock %}

@@ -25,7 +25,7 @@ Student Number:21025329-->
     </div>
 
     <h2 class="font">Now the fun part!</h2>  
-    <h2 class ="font"> Add your income, expenses and savings to your Budget!!!</h2>
+    <h2 class ="font"> How much do you have saved?!!!</h2>
 
     {% with messages = get_flashed_messages() %}
         {% if messages %}
@@ -38,15 +38,6 @@ Student Number:21025329-->
     {% endwith %}
 
     <form action="/addvalues/" method="POST">
-        <h2>Add Income</h2>
-        <input type="text" name="income_source" placeholder="Income Source" required>
-        <input type="number" name="income_amount" placeholder="Income Amount" required>
-        <button type="submit" name="add_income">Add Income</button>
-    
-        <h2>Add Expenses</h2>
-        <input type="text" name="expense_name" placeholder="Expense Name" required>
-        <input type="number" name="expense_amount" placeholder="Expense Amount" required>
-        <button type="submit" name="add_expense">Add Expense</button>
     
         <h2>Add Savings</h2>
         <input type="text" name="saving_name" placeholder="Saving Name" required>
