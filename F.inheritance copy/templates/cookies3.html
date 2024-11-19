@@ -1,45 +1,63 @@
 <!-- HTML file, explains how cookies may be used 
 Author: Ana Paula Goncalves 
 Student Number:21025329-->
-{%extends "base.html"%}
-{%block head %}
-    {%block title%} {%endblock%}
-{%endblock%}
+{%extends "base2.html"%}
+{% block head %}
+    {% block title %} 
+        {{ super() }} 
+    {% endblock %}
+{% endblock %}
 
-{%block content%}
-<div class = "header">
-    <a class = "secondary" href="/"  target="_self"> <span class="font">HT</span> Horizon Travels</a>
-</div>
+{% block content %}
+
 <body>
-    <h1 class="title"> Cookies Policy </h1>
-    This policy explains how our website use cookies.
+<div class="col-12 col-m-9 col-x-12">
+    <div class="tab">
+        <button type="button" onclick="location.href='/userhome/';"> Home Page</button>
+        <button type="button" onclick="location.href='/editbooking/';">My Account</button>
+        <button type="button" onclick="location.href='/view_budget';">View Budget</button>
+        <button type="button" onclick="location.href='/';">Chat to Evan</button>
+        <button type="button" onclick="location.href='/cookies/';">Cookies</button>
+        <button type="button" onclick="location.href='/logout/';">Logout</button>
+    </div>
 
-    <h1 class="heading"> What is Cookies? </h1>
-    <p> Cookies are text files containing small amounts of information which are downloaded to your personal computer, 
-        mobile or other device when you visit a website.</p>
-    <p>Cookies are then sent back to the originating website on each subsequent visit, 
-        or to another website that recognises that cookie. Cookies are useful because they allow a website to recognise a user's device. </p>
-    <p>Cookies in themselves do not identify you, just the computer or device you are using. Cookies do lots of different jobs, like making it easier for you to log onto, and use, our site during future visits, letting you navigate between pages efficiently, remembering your preferences, and generally improving your experience. They also allow us 
-        to monitor traffic on our site and can also help to ensure that advertising you see online is more relevant to you and your interests.</p>
-    <p>Cookies themselves only record which areas of our site have been visited by your computer or device and for how long. 
-        Allowing us to create a cookie does not give us access to the rest of your computer, 
-        and does not allow us to see any personally identifiable data about you.</p>
 
-    <h2 class="heading"> Types of Cookies </h2>
-    <p> We've arranged the Cookies we use into three groups: </p>
-    <ul>
-        <li>a) <b>Required cookies: </b>  These Cookies are necessary for core features of this site to operate properly. Because they are needed for the site's operation, they are always set to "Active". They include, for example, cookies that enable you to log into secure areas of our website or make a purchase. </li>
-        <li>b) <b>Functionality cookies: </b>  These Cookies allow us to analyze site usage in order to evaluate and improve its performance. They are also used to provide a better user experience on the site, such as by measuring interactions with particular content or remembering settings. 
-        </li>
-        <li>c) <b>Advertising cookies: </b> These Cookies are used by advertising companies to inform and serve personalized ads more relevant to your interests. 
-            These Cookies also may facilitate sharing information with social networks or recording your interactions with particular ads.</li>
-    </ul>
-    <h3 class="heading"> If you choose not to use cookies </h3>
-    <p>If you choose not to accept any Functionality or Advertising cookies or your browser is not compatible with our cookie preference tool we will only use Required cookies.</p>
+    <h1 class="title">Cookies Policy</h1>
+<p>This policy explains how our website uses cookies.</p>
 
-    <h4 class="heading"> Cookies that have been set in the past </h4>
-    <p> If you have disabled one or more Functionality or Advertising cookies, we may still use information collected from cookies prior to your disabled preference being set, however, we will stop using any disabled cookies to collect any further information.</p>
-</body>
+<h1 class="heading">What are Cookies?</h1>
+<p>Cookies are text files containing small amounts of information that are downloaded to your personal computer, </p>
+    <p>mobile, or other device when you visit a website.</p>
+
+<p>Cookies are then sent back to the originating website on each subsequent visit, or to another website that recognizes that cookie.</p>
+    <p>They are useful because they allow a website to recognize a user's device.</p>
+
+<p>Cookies themselves do not identify you personally, only the computer or device you are using. </p>
+    <p>They perform various tasks, such as making it easier for you to log in and use our site during future visits, </p>
+        <p>enabling efficient navigation between pages, remembering your preferences, and generally improving your experience.</p>
+
+<p>They also allow us to monitor traffic on our site and help ensure that the ads you see online are more relevant to your interests.</p>
+
+<p>Cookies only record which areas of our site have been visited by your device and for how long. Allowing us to create a cookie does not give us access to the rest of your computer or allow us to view any personally identifiable data about you.</p>
+
+<h2 class="heading">Types of Cookies</h2>
+<p>We've arranged the cookies we use into three groups:</p>
+
+<ul>
+    <li>a) <b>Required cookies:</b> </br>
+        These cookies are necessary for core features of this site to operate properly. They are always set to "Active" because they are needed for the site's operation. They include cookies that enable you to log into secure areas of our website or make a purchase.</li>
+    <li>b) <b>Functionality cookies:</b> </br>
+        These cookies allow us to analyze site usage to evaluate and improve its performance. They are also used to enhance user experience on the site, such as by measuring interactions with particular content or remembering settings.</li>
+    <li>c) <b>Advertising cookies:</b> </br>These cookies are used by advertising companies to inform and serve personalized ads relevant to your interests. They may also facilitate sharing information with social networks or record your interactions with particular ads.</li>
+</ul>
+
+<h3 class="heading">If You Choose Not to Use Cookies</h3>
+<p>If you choose not to accept any Functionality or Advertising cookies, 
+    <br>or if your browser is not compatible with our cookie preference tool, we will only use Required cookies.</p>
+
+<h4 class="heading">Cookies That Have Been Set in the Past</h4>
+<p>If you have disabled one or more Functionality or Advertising cookies, <br>
+    we may still use information collected from cookies prior to your disabled preference being set. However, we will stop using any disabled cookies to collect further information.</p>
 {%endblock%}
 
 {%block footer%}
