@@ -27,24 +27,22 @@ Student Number:21025329-->
         padding: 15px; 
         }
 
-        /* Style the buttons that are used to open the tab content */
         .tab button {
-        display: block;
-        background-color: #C8A2C8;
-        color: white;
-        padding: 10px 10px;
-        width: 100%;
-        border: none;
-        outline: none;
-        text-align: left;
-        cursor: pointer;
-        transition: 0.3s;
-        font-size: 100%;
+            margin-bottom: 10px;
+            padding: 10px 0; /* Adjusted to ensure consistent height */
+            font-size: 14px;
+            color: white;
+            background-color: #9370db;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%; /* Ensures all buttons take the full width of the sidebar */
+            text-align: center; /* Centers the text inside the button */
+            box-sizing: border-box; /* Includes padding in width calculation */
         }
-
-        /* Change background color of buttons on hover */
+        
         .tab button:hover {
-        background-color:  #4B0082;
+            background-color: #7a5bb3;
         }
         
         .header {
@@ -205,6 +203,12 @@ Student Number:21025329-->
             color: black; 
           }
 
+          /* Ensure scrolling works properly */
+            html, body {
+                height: 100%;
+                overflow-y: auto; /* Enable vertical scrolling */
+            }
+
           .fixedF {
             width: 100%;
             border: 1px;
@@ -286,6 +290,7 @@ Student Number:21025329-->
     <body>
         <div>
             {%block content%}
+            
             where the content will go 
             {%endblock%}
         </div>

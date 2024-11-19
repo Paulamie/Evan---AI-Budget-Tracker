@@ -15,7 +15,7 @@ Student Number:21025329-->
 <div class="col-12 col-m-9 col-x-12">
 
     <div class="tab">   
-        <button type="button" onclick="location.href='/editbooking/';"> My account</button> <!--change the page that this goes to - at the moment it doesn't go anywhere
+        <button type="button" onclick="location.href='/userAccount';"> My account</button> <!--change the page that this goes to - at the moment it doesn't go anywhere
                                                                                                 in this page the user should be able to link their bank account-->
         <button type="button" onclick="location.href='/view_budget';"> View Budget</button> <!-- this will allow the user to edit their income/ expenses.-->
         <button type="button" onclick="location.href='/createBudget/';"> Create Budget</button> <!-- this button allows the user to create a new budget-->
@@ -28,7 +28,7 @@ Student Number:21025329-->
         <button type="button" onclick="location.href='/logout/';"> Logout </button> 
     </div>
     
-        <h1 class="font"> Welcome {{username}}!</h1>
+        <h1 class="font"> Welcome!</h1>
 
         {% if error %}
             <div class="error-message">

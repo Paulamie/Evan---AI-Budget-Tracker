@@ -1,0 +1,106 @@
+<!-- HTML file, standard user features - update their details -->
+{% extends "base2.html" %}
+
+{% block head %}
+    {% block title %} 
+        {{ super() }} 
+    {% endblock %}
+
+    <style>
+        /* Container for the form */
+        .form-container {
+            max-width: 600px; /* Limit the width for better proportion */
+            margin: 0 auto; /* Center the form */
+            padding: 20px; /* Add some padding around the form */
+            border: 1px solid #ddd; /* Optional: Add border for better visibility */
+            border-radius: 8px; /* Rounded corners */
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Optional: Shadow for depth */
+        }
+
+        /* Style for input fields */
+        input[type="text"],
+        input[type="password"] {
+            width: 100%; /* Make input fields take full width */
+            padding: 10px; /* Add padding inside the inputs */
+            margin: 10px 0; /* Space between inputs */
+            border: 1px solid #ccc; /* Border styling */
+            border-radius: 4px; /* Rounded corners */
+            box-sizing: border-box; /* Include padding and border in width */
+        }
+
+        /* Style for buttons */
+        button {
+            width: 100%; /* Full width for buttons */
+            padding: 10px; /* Padding for buttons */
+            background-color: #C8A2C8; /* Button color */
+            color: white; /* Text color */
+            border: none; /* No border */
+            border-radius: 5px; /* Rounded corners */
+            cursor: pointer; /* Pointer on hover */
+            margin: 10px 0; /* Space between buttons */
+        }
+
+        button:hover {
+            background-color: #4B0082; /* Darker shade on hover */
+        }
+
+        /* Message styles */
+        .message {
+            color: green; /* Success message color */
+            margin-top: 10px; /* Space above message */
+        }
+
+        .error-message {
+            color: red; /* Error message color */
+            margin-top: 10px; /* Space above error message */
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<body>
+    <div class="col-12 col-m-9 col-x-12">
+        <div class="tab">   
+            <button type="button" onclick="location.href='/userhome/';"> Home Page</button>
+            <button type="button" onclick="location.href='/view_budget';"> View Budget</button> 
+            <button type="button" onclick="location.href='/';"> Your Patterns</button> 
+            <button type="button" onclick="location.href='/';"> Calendar View</button> 
+            <button type="button" onclick="location.href='/';"> Investments Tracking</button> 
+            <button type="button" onclick="location.href='/';"> Chat to Evan</button> 
+            <button type="button" onclick="location.href='/privacyStatement';"> Privacy </button>
+            <button type="button" onclick="location.href='/cookies';"> Cookies</button>
+            <button type="button" onclick="location.href='/logout/';"> Logout </button> 
+        </div>
+        
+        <div class="form-container">
+            <h2 class="font">Edit your Account Details</h2>
+
+            <!-- Success message -->
+            {% if message %}
+                <p class="message">{{ message }}</p>
+            {% endif %}
+
+            <!-- Error message -->
+            {% if error %}
+                <p class="error-message">{{ error }}</p>
+            {% endif %}
+
+            <!-- Update form -->
+            <form action="/userAccount" method="post"> 
+                <label for="username">Username:</label> 
+                <input type="text" name="username" value="{{ request.form.username or '' }}"></br>
+
+                <label for="password">Update Password:</label>
+                <input type="password" name="password" value="{{ request.form.password or '' }}"></br>
+                <p> Please note that you are unable to change your username</p>
+
+                <button type="submit" name="update_details">Update</button>
+            </form>
+        </div>
+    </div>  
+</body>
+{% endblock %}
+
+{% block footer %}
+    {{ super() }}
+{% endblock %}

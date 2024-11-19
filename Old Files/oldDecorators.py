@@ -808,8 +808,7 @@ def generate_user_record():
     return """
         <h1> this is User record for user {} </h1> 
         <a href='/userfeatures')> Go to User Features page </a>
-    """.format(session['username']) #how can i make the history of a user booking be displayed here?
-    #initial thought: during booking process user is required to log in and then we put the system to save that booking under the 
+    """.format(session['username']) 
     
 
 

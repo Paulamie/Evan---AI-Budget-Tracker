@@ -327,23 +327,6 @@ def add_savings():
 
     return render_template('addSavings.html')  # Render the savings form for GET requests
 
-
-# @app.route('/addvalues/', methods=['GET', 'POST'])
-# @login_required
-# def add_financial_entries():
-#     username = session['username']
-
-#     if request.method == 'POST':
-#         # Determine which entry to add based on the button pressed
-#         if 'add_income' in request.form:
-#             return add_income()
-#         elif 'add_expense' in request.form:
-#             return add_expenses()
-#         elif 'add_saving' in request.form:
-#             return add_savings()
-
-#     return render_template('addvalues.html')  # Render the form template
-
 @app.route('/view_budget')
 @login_required
 def view_budget():
@@ -374,6 +357,12 @@ def view_budget():
         total_income = sum(float(income[3]) for income in incomes) if incomes else 0.0  # Convert to float
         total_expenses = sum(float(expense[3]) for expense in expenses) if expenses else 0.0  # Convert to float
         total_savings = sum(float(savings[3]) for savings in savings) if savings else 0.0  # Convert to float
+        
+        #Calculate total budget amount
+        total_budget_amount = total_income + total_savings
+        
+        # Calculate remaining budget
+        remaining_budget = total_budget_amount - total_expenses
         print("calculated")
 
     except Exception as e:
@@ -398,6 +387,8 @@ def view_budget():
         savings=savings_list,
         incomes=incomes,
         expenses=expenses,
+        total_budget_amount = total_budget_amount,
+        remaining_budget = remaining_budget,
         total_income=total_income,
         total_expenses=total_expenses,
         total_savings=total_savings
@@ -472,8 +463,72 @@ def delete_saving(saving_id):
         conn.close()
 
     return redirect(url_for('view_budget'))
+# Update user data -> Update name, email, and password in one page
+@app.route('/userAccount', methods=["POST", "GET"])
+@login_required
+@standard_user_required
+def update_user_data():
+    error = ''
+    print('Update process started')
+    try:
+        if request.method == "POST":
+            # Retrieve form data
+            username = request.form.get('username')
+            password = request.form.get('password')
 
+            if username and password:  # Check for non-empty inputs
+                print('Valid username and password received')
 
+                conn = dbfunc.getConnection()
+                if conn and conn.is_connected():  # Ensure the database connection is established
+                    print('MySQL Connection established')
+                    dbcursor = conn.cursor()
+
+                    # Hash the new password
+                    hashed_password = sha256_crypt.hash(str(password))
+
+                    # Check if the user exists
+                    verify_query = "SELECT * FROM users WHERE username = %s;"
+                    dbcursor.execute(verify_query, (username,))
+                    user_exists = dbcursor.fetchone()  # Check if any result exists
+
+                    if not user_exists:
+                        error = "Username not found, please enter a valid username."
+                        print(error)
+                        return render_template("useraccount.html", error=error)
+                    else:
+                        # Update the password in the database
+                        update_query = "UPDATE users SET password_hash = %s WHERE username = %s"
+                        dbcursor.execute(update_query, (hashed_password, username))
+                        conn.commit()  # Save changes to the database
+
+                        print("Password updated successfully!")
+                        dbcursor.close()
+                        conn.close()
+                        gc.collect()
+
+                        # Update session variables
+                        session['logged_in'] = True
+                        session['username'] = username
+                        session['usertype'] = 'standard'  # Default user type
+
+                        # Display success message
+                        return render_template("useraccount.html", message="Password updated successfully!")
+                else:
+                    error = "Database connection error. Please try again later."
+                    print(error)
+                    return render_template("useraccount.html", error=error)
+            else:
+                error = "Username or password cannot be empty."
+                print(error)
+                return render_template("useraccount.html", error=error)
+        else:
+            # Render the user account page for GET requests
+            return render_template("useraccount.html", error=error)
+    except Exception as e:
+        error = f"An error occurred: {str(e)}"
+        print(error)
+        return render_template("useraccount.html", error=error)
 #privacy page 
 @app.route ('/privacyStatement') #inheritance: base.html
 def privacyPage():
@@ -483,12 +538,6 @@ def privacyPage():
 @app.route ('/cookies') #inheritance: base.html
 def Cookies():
     return render_template ('cookies3.html')
-
-
-#New booking page 
-@app.route ('/bookings') #inheritance: secondbase.html
-def newBookings():
-    return render_template ('NewBookings.html') 
 
 
 
