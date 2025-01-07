@@ -187,7 +187,7 @@ def logout():
     gc.collect()
     return render_template('account2.html', optionalmessage='You have been logged out')
 
-
+#######################################################################################################################################
 #/adminfeatures is loaded for admin users
 @app.route('/adminfeatures/')
 @login_required
@@ -201,7 +201,7 @@ def admin_features():
              message='Admin data from app and admin features can go here ...')
 
     
-
+#######################################################################################################################################
 @app.route('/createBudget/', methods=['GET', 'POST'])
 @login_required
 def create_budget():
@@ -236,6 +236,7 @@ def create_budget():
     
     return render_template("success.html")
 
+#######################################################################################################################################
 @app.route('/addIncome', methods=['GET', 'POST'])
 @login_required
 def add_income():
@@ -327,6 +328,7 @@ def add_savings():
 
     return render_template('addSavings.html')  # Render the savings form for GET requests
 
+#######################################################################################################################################
 @app.route('/view_budget')
 @login_required
 def view_budget():
@@ -394,6 +396,7 @@ def view_budget():
         total_savings=total_savings
     )
 
+#######################################################################################################################################
 @app.route('/deleteIncome/<int:income_id>', methods=['POST'])
 @login_required
 def delete_income(income_id):
@@ -463,6 +466,8 @@ def delete_saving(saving_id):
         conn.close()
 
     return redirect(url_for('view_budget'))
+
+#######################################################################################################################################
 # Update user data -> Update name, email, and password in one page
 @app.route('/userAccount', methods=["POST", "GET"])
 @login_required
@@ -529,18 +534,168 @@ def update_user_data():
         error = f"An error occurred: {str(e)}"
         print(error)
         return render_template("useraccount.html", error=error)
+
+#######################################################################################################################################
+
+def predict_future_expenses(expenses, months=3, growth_factor=1.05): #simple prediction algorithm - for now, later on implement machine learning
+    if not expenses:
+        return 0.0  # No data, cannot predict
+    
+    username = session['username']
+    conn = dbfunc.getConnection()
+        
+    with conn.cursor() as cursor:
+        cursor.execute("SELECT * FROM expenses WHERE username = %s", (username,))
+        expenses = cursor.fetchall()
+        
+    total_spent = sum(float(expense[3]) for expense in expenses) if expenses else 0.0  # Convert to float
+    # If you want a monthly average, and 'expenses' is only for 'months' months:
+    average_spent = total_spent / months
+    
+    # Apply a small growth factor to account for monthly cost increases
+    predicted_next_month = average_spent * growth_factor
+    return round(predicted_next_month, 2)
+
+
+#page for the reports/ user patterns 
+@app.route('/report')
+@login_required
+def view_report():
+    username = session['username']
+    conn = dbfunc.getConnection()
+
+    with conn.cursor() as cursor:
+        # Example queries
+        cursor.execute("SELECT budget_name, budget_amount FROM budgets WHERE username = %s", (username,))
+        budget_data = cursor.fetchone()  # (budget_name, budget_amount)
+
+        cursor.execute("SELECT SUM(expense_amount) FROM expenses WHERE username = %s", (username,))
+        total_expenses_data = cursor.fetchone()  # (sum_of_expenses)
+
+        cursor.execute("SELECT expense_name, expense_amount, DATE(created_at) as date FROM expenses WHERE username = %s ORDER BY created_at DESC", (username,))
+        expenses_data = cursor.fetchall()
+
+    # Convert 'expenses_data' to a list of objects for easier manipulation
+    # e.g., [ { 'date': row[2], 'name': row[0], 'amount': row[1] }, ... ]
+    expenses_list = [
+        {'name': row[0], 'amount': float(row[1]), 'date': row[2]} 
+        for row in expenses_data
+    ]
+
+    # Simple predictive approach
+    # - For demonstration, assume the user only has 3 months of data
+    predicted_expenses = predict_future_expenses(expenses_list, months=3, growth_factor=1.05)
+    
+    return render_template(
+        'reports.html',
+        budget_name=budget_data[0],
+        budget_amount=float(budget_data[1]),
+        total_expenses=float(total_expenses_data[0]) if total_expenses_data[0] else 0.0,
+        expenses=expenses_list,
+        predicted_expenses=predicted_expenses
+    )
+
+#######################################################################################################################################
+def get_month_range(year, month, past=1, future=1):
+    start_year = year - past
+    start_month = month
+
+    end_year = year + future
+    end_month = month
+
+    current_y = start_year
+    current_m = start_month
+
+    # We'll go until we surpass (end_year, end_month)
+    while (current_y < end_year) or (current_y == end_year and current_m <= end_month):
+        yield (current_y, current_m)
+        current_m += 1
+        if current_m == 13:
+            current_m = 1
+            current_y += 1
+  
+@app.route ('/calendarView')
+@login_required
+def calendar():
+    username = session['username']
+    conn = dbfunc.getConnection()
+
+    # 1-year range from current date
+    current_year = datetime.now().year
+    current_month = datetime.now().month
+
+    # Build dictionary for 1 year in the past and 1 year in the future
+    # e.g., from (current_year - 1, current_month) to (current_year + 1, current_month)
+    calendar_data = {}
+
+    with conn.cursor() as cursor:
+        # For each month in that range:
+        # We'll use a function to loop from (current_year-1, current_month) to (current_year+1, current_month)
+        for (year, month) in get_month_range(current_year, current_month, past=1, future=1):
+            # Key: yyyy-mm
+            ym_key = f"{year}-{str(month).zfill(2)}"
+
+            # Query for expenses in that month
+            cursor.execute("""
+                SELECT expense_name, expense_amount, DATE(created_at)
+                FROM expenses
+                WHERE username = %s
+                AND MONTH(created_at) = %s
+                AND YEAR(created_at) = %s
+                ORDER BY created_at
+            """, (username, month, year))
+            expense_rows = cursor.fetchall()
+            # Convert to list of dictionaries
+            expense_list = []
+            for row in expense_rows:
+                expense_list.append({
+                    "name": row[0],
+                    "amount": float(row[1]),
+                    "date": str(row[2])  # e.g., '2025-03-15'
+                })
+
+            # Query for income
+            cursor.execute("""
+                SELECT income_source, income_amount, DATE(created_at)
+                FROM income
+                WHERE username = %s
+                AND MONTH(created_at) = %s
+                AND YEAR(created_at) = %s
+                ORDER BY created_at
+            """, (username, month, year))
+            income_rows = cursor.fetchall()
+            income_list = []
+            for row in income_rows:
+                income_list.append({
+                    "name": row[0],
+                    "amount": float(row[1]),
+                    "date": str(row[2])
+                })
+
+            # Insert into calendar_data
+            calendar_data[ym_key] = {
+                "expenses": expense_list,
+                "income": income_list
+            }
+
+    return render_template(
+        'calendar.html',
+        calendar_data=calendar_data
+    )
+    
+#######################################################################################################################################
 #privacy page 
-@app.route ('/privacyStatement') #inheritance: base.html
+@app.route ('/privacyStatement')
 def privacyPage():
     return render_template ('privacy4.html')
 
 #cookies page 
-@app.route ('/cookies') #inheritance: base.html
+@app.route ('/cookies')
 def Cookies():
     return render_template ('cookies3.html')
 
 
-
+#######################################################################################################################################
 #debuggers
 if __name__ == '__main__':   
    app.run(port=8000,debug = True)
