@@ -896,6 +896,163 @@ def investment_advice(objective, user_portfolio):
 
 
 #######################################################################################################################################
+def get_user_budget(username, conn):
+    """
+    Returns a dictionary with the user's budget information, including:
+        - budget_name
+        - budget_amount
+        - total_income (sum of 'income_amount' in 'income' table)
+        - total_expenses (sum of 'expense_amount' in 'expenses' table)
+        - leftover = total_income - total_expenses
+        - budgets_table_savings (value from 'budgets.savings' column)
+        - sum_of_savings_table (sum of 'saving_amount' in 'savings' table)
+    """
+    budget_data = {
+        'budget_name': None,
+        'budget_amount': 0.0,    
+        'total_income': 0.0,
+        'total_expenses': 0.0,
+        'leftover': 0.0,
+        'sum_of_savings_table': 0.0      # Sum of entries in the 'savings' table
+    }
+
+    with conn.cursor() as cursor:
+        # 1) Fetch the single row from `budgets`
+        cursor.execute("""
+            SELECT budget_name, budget_amount
+            FROM budgets
+            WHERE username = %s
+            LIMIT 1;
+        """, (username,))
+        row = cursor.fetchone()
+        if row:
+            budget_data['budget_name'] = row[0]
+            budget_data['budget_amount'] = float(row[1])
+    
+
+        # 2) Sum incomes
+        cursor.execute("""
+            SELECT COALESCE(SUM(income_amount), 0)
+            FROM income
+            WHERE username = %s;
+        """, (username,))
+        row = cursor.fetchone()
+        total_income = float(row[0]) if row else 0.0
+        budget_data['total_income'] = total_income
+
+        # 3) Sum expenses
+        cursor.execute("""
+            SELECT COALESCE(SUM(expense_amount), 0)
+            FROM expenses
+            WHERE username = %s;
+        """, (username,))
+        row = cursor.fetchone()
+        total_expenses = float(row[0]) if row else 0.0
+        budget_data['total_expenses'] = total_expenses
+
+        # 4) Sum leftover: (income - expenses)
+        leftover = total_income - total_expenses
+        budget_data['leftover'] = leftover
+
+        # 5) Sum from the `savings` table
+        cursor.execute("""
+            SELECT COALESCE(SUM(saving_amount), 0)
+            FROM savings
+            WHERE username = %s;
+        """, (username,))
+        row = cursor.fetchone()
+        sum_of_savings_table = float(row[0]) if row else 0.0
+        budget_data['sum_of_savings_table'] = sum_of_savings_table
+
+    return budget_data
+
+def get_user_stocks(username, conn):
+    """
+    Returns a dict mapping {symbol: quantity, ...}
+    for the user's owned stocks from 'stocks_owned'.
+    """
+    stocks = {}
+    with conn.cursor() as cursor:
+        cursor.execute("""
+            SELECT symbol, quantity
+            FROM stocks_owned
+            WHERE username = %s;
+        """, (username,))
+        for row in cursor.fetchall():
+            symbol = row[0]
+            qty = row[1]
+            stocks[symbol] = qty
+    return stocks
+
+@app.route('/evan', methods=['GET', 'POST'])
+@login_required
+def evan():
+    username = session['username']
+    conn = dbfunc.getConnection()
+
+    # Load (or create) conversation from session
+    conversation = session.get('conversation', [])
+
+    # Fetch the user’s budget info and stocks
+    user_budget = get_user_budget(username, conn)
+    user_stocks = get_user_stocks(username, conn)
+    conn.close()
+
+    if request.method == 'POST':
+        user_message = request.form.get('user_message', '').strip()
+        if user_message:
+            # Append user message
+            conversation.append({'role': 'user', 'text': user_message})
+
+            # Generate reply
+            assistant_reply = chat_evan_response(user_message, user_budget, user_stocks)
+            conversation.append({'role': 'assistant', 'text': assistant_reply})
+
+        # Store updated conversation in session
+        session['conversation'] = conversation
+
+    # GET request: show chat page
+    return render_template('evanChat.html', conversation=conversation)
+
+
+def chat_evan_response(user_message, budget, stocks):
+    """
+    A mock "ChatGPT-like" function that has access to the user's budget and stock data.
+    Returns a string response based on the user's query.
+    """
+    # Simple keyword-based approach:
+    text_lower = user_message.lower()
+
+    # Check if user is asking about leftover or budget
+    if "leftover" in text_lower or "budget" in text_lower:
+        return (f"Your monthly budget leftover is {budget['leftover']}. "
+            f"You earn {budget['total_income']} and spend {budget['total_expenses']} ...")
+    
+    # Check if user is asking about stocks
+    elif "stock" in text_lower or "invest" in text_lower:
+        # For demonstration, we'll just say what the user owns
+        if not stocks:
+            return "You currently don't own any stocks. Maybe consider buying some dividend stocks?"
+        else:
+            # Build a quick summary of their holdings
+            holdings_summary = ", ".join([f"{sym} ({qty} shares)" for sym, qty in stocks.items()])
+            return (f"You own the following stocks: {holdings_summary}. "
+                    "Consider your risk profile before buying or selling more.")
+    
+    # Check for a specific symbol mention, e.g. "T" or "KO"
+    elif "t" in text_lower and "stocks" in text_lower:
+        if "T" in stocks:
+            return "You own T. It's a high-dividend telecom. Holding could be beneficial if you want dividends."
+        else:
+            return "You don't currently own T. It's known for dividends if that's your focus."
+
+    # Otherwise, default response
+    return "I'm here to help with your budget and investments—could you clarify what you'd like to know?"
+
+
+
+
+#######################################################################################################################################
 
 #privacy page 
 @app.route ('/privacyStatement')
