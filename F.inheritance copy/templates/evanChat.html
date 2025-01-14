@@ -94,10 +94,18 @@
             {% endfor %}
         </div>
 
-        <!-- Chat input form -->
-        <form method="POST" class="chat-form">
+        <!-- Chat input form (POST to /chat) -->
+        <form method="POST" class="chat-form" action="{{ url_for('clear_chat') }}">
             <input type="text" name="user_message" placeholder="Ask Evan something..." required>
             <button type="submit">Send</button>
+        </form>
+
+        <!-- Clear Chat button (POST to /chat/clear) -->
+        <form method="POST" action="{{ url_for('clear_chat') }}" style="margin-top: 10px;">
+            <button type="submit"
+                    style="background-color: #888; border: none; border-radius: 3px; padding: 8px 16px; cursor: pointer; color: #fff;">
+                Clear Chat
+            </button>
         </form>
     </div>
 </body>

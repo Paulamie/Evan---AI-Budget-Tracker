@@ -1049,6 +1049,14 @@ def chat_evan_response(user_message, budget, stocks):
     # Otherwise, default response
     return "I'm here to help with your budget and investments—could you clarify what you'd like to know?"
 
+@app.route('/evan/clear', methods=['POST'])
+@login_required
+def clear_chat():
+    # Empty the conversation
+    session['conversation'] = []
+    flash("Chat cleared.")
+    return redirect(url_for('evan'))
+
 
 
 
