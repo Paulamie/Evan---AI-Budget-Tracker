@@ -28,9 +28,48 @@ def myAccount():
 
 @app.route('/userhome/')
 def userHome():
-    return render_template('userHome.html', username=session['username'])
+    username = session.get('username', 'Guest')
+    username = session['username']
+    conn = dbfunc.getConnection()
 
+    try:
+        # Fetch budget details
+        with conn.cursor() as cursor:
+            cursor.execute("SELECT * FROM budgets WHERE username = %s", (username,))
+            budget = cursor.fetchone()
 
+            # Check if a budget exists
+            if not budget:
+                flash("No budget created")
+
+            cursor.execute("SELECT * FROM income WHERE username = %s", (username,))
+            incomes = cursor.fetchall()
+
+            cursor.execute("SELECT * FROM expenses WHERE username = %s", (username,))
+            expenses = cursor.fetchall()
+
+            cursor.execute("SELECT * FROM savings WHERE username = %s", (username,))
+            savings = cursor.fetchall()
+
+        # Calculate totals
+        total_income = sum(float(income[3]) for income in incomes) if incomes else 0.0  # Convert to float
+        total_expenses = sum(float(expense[3]) for expense in expenses) if expenses else 0.0  # Convert to float
+        total_savings = sum(float(savings[3]) for savings in savings) if savings else 0.0  # Convert to float
+        
+        print("calculated")
+
+    finally:
+        conn.close()  # Always close the connection
+        
+    return render_template(
+        'userHome.html', 
+        username=username,
+        total_income=total_income,
+        total_expenses=total_expenses,
+        total_savings=total_savings
+    )
+
+############################################################################################################################
 @app.route ('/dumpsVar/', methods = ['POST', 'GET']) #i'm not sure we need this 
 def dumpVar():
 	if request.method == 'POST':
@@ -53,7 +92,7 @@ def homepage(usertype):
     return render_template ('account2.html', usertype=usertype)
 
 
-
+###############################################################################################################
 @app.route('/register/', methods=['POST', 'GET'])
 def register():
     error = ''
@@ -365,7 +404,7 @@ def view_budget():
         
         # Calculate remaining budget
         remaining_budget = total_budget_amount - total_expenses
-        print("calculated")
+        
 
     except Exception as e:
         flash(f"An error occurred while retrieving budget data: {str(e)}")
@@ -684,6 +723,180 @@ def calendar():
     )
     
 #######################################################################################################################################
+#investement tracking page 
+@app.route('/investments')
+@login_required
+def investments():
+    username = session['username']
+    conn = dbfunc.getConnection()
+
+    user_stocks = []
+    try:
+        # fetching from a 'stocks_owned' table
+        with conn.cursor() as cursor:
+            cursor.execute("""
+                SELECT symbol, quantity
+                FROM stocks_owned
+                WHERE username = %s;
+            """, (username,))
+            rows = cursor.fetchall()
+
+            # Build user_stocks as a list of dicts
+            for row in rows:
+                symbol = row[0]
+                qty = row[1]
+                suggestion = "Buy more?" if qty < 5 else "Hold"
+                user_stocks.append({
+                    "symbol": symbol,
+                    "quantity": qty,
+                    "suggestion": suggestion
+                })
+    finally:
+        conn.close()
+
+    return render_template(
+        'investment.html',  
+        user_stocks=user_stocks
+    )
+    
+@app.route('/investments/addStock', methods=['POST'])
+@login_required
+def add_stock():
+    username = session['username']
+
+    symbol = request.form['stockSymbol'].strip().upper()
+    qty_str = request.form['stockQty'].strip()
+
+    # Basic validation
+    try:
+        quantity = int(qty_str)
+        if quantity <= 0:
+            raise ValueError("Quantity must be > 0")
+    except ValueError:
+        flash("Invalid quantity.")
+        return redirect(url_for('investments'))
+
+    conn = dbfunc.getConnection()
+    try:
+        with conn.cursor() as cursor:
+            # Insert or update row
+            cursor.execute("""
+                INSERT INTO stocks_owned (username, symbol, quantity)
+                VALUES (%s, %s, %s)
+                ON DUPLICATE KEY UPDATE quantity = quantity + VALUES(quantity);
+            """, (username, symbol, quantity))
+            conn.commit()
+    finally:
+        conn.close()
+
+    flash(f"Added {quantity} shares of {symbol}")
+    return redirect(url_for('investments'))
+    
+@app.route('/investments/sellStock', methods=['POST'])
+@login_required
+def sell_stock():
+    username = session['username']
+    symbol = request.form['symbol'].strip().upper()
+
+    conn = dbfunc.getConnection()
+    try:
+        with conn.cursor() as cursor:
+            # Delete the stock from the user's holdings
+            cursor.execute("""
+                DELETE FROM stocks_owned 
+                WHERE username = %s AND symbol = %s;
+            """, (username, symbol))
+            conn.commit()
+    finally:
+        conn.close()
+
+    flash(f"You have sold all your shares of {symbol}.")
+    return redirect(url_for('investments'))    
+
+#mock up - simple algorithm to track stocks - Over time, i can integrate real stock data (Yahoo Finance API, Alpaca, etc.) and store user trades in my own database.
+def investment_advice(objective, user_portfolio):
+    """
+    Provide a list of recommended stocks based on the user's investment objective,
+    and also return advice for each stock the user already owns.
+
+    :param objective: str indicating the user's investment goal.
+                      e.g. 'dividends', 'variety', 'highRisk', 'lowRisk'.
+    :param user_portfolio: dict mapping { 'symbol': quantity_owned, ... }.
+    :return:
+        recommended: list of symbols to recommend,
+        owned_advice: dict mapping { symbol: advice_string, ... } for the user's current holdings.
+    """
+
+    # A mock dataset with basic attributes for each symbol
+    # Typically you might get actual data from a DB or API
+    mock_stocks = {
+      'T':     {'dividend': 'high',    'risk': 'low'},
+      'KO':    {'dividend': 'steady',  'risk': 'low'},
+      'TSLA':  {'dividend': 'none',    'risk': 'high'},
+      'ARKK':  {'dividend': 'none',    'risk': 'high'},
+      'VXUS':  {'dividend': 'moderate','risk': 'medium'},
+      'VTI':   {'dividend': 'moderate','risk': 'medium'},
+      'BND':   {'dividend': 'steady',  'risk': 'low'},
+      'BRK.B': {'dividend': 'none',    'risk': 'low'},
+      # etc.
+    }
+
+    # will build a list of recommended stock symbols
+    recommended = []
+
+    # Example logic for each objective
+    # Feel free to refine or expand these conditions
+    for symbol, data in mock_stocks.items():
+        # High dividend preference
+        if objective == 'dividends':
+            # user wants high or steady dividend
+            if data['dividend'] in ['high', 'steady']:
+                recommended.append(symbol)
+
+        # More variety = aiming for different sectors or a broad ETF
+        elif objective == 'variety':
+            # For a naive approach, let's just pick "medium" risk ETFs or multiple sectors
+            # e.g. VTI, VXUS 
+            if symbol in ['VTI', 'VXUS']:
+                recommended.append(symbol)
+
+        # High-risk approach, looking for growth or speculation
+        elif objective == 'highRisk':
+            if data['risk'] == 'high':
+                recommended.append(symbol)
+
+        # Low-risk approach
+        elif objective == 'lowRisk':
+            if data['risk'] in ['low', 'medium'] and data['dividend'] != 'none':
+                # e.g. T, KO, BND, BRK.B might qualify
+                recommended.append(symbol)
+
+        # If you wanted to handle additional objectives, you can continue elif blocks here.
+
+    # Now build advice for the user's owned portfolio
+    # e.g., if user has < 5 shares, we say "Buy more?"; if they have many in a high-risk stock, maybe "Sell or reduce?"
+    owned_advice = {}
+    for owned_symbol, qty in user_portfolio.items():
+        # if the user doesn't own a known symbol in mock_stocks, we can just skip or default
+        data = mock_stocks.get(owned_symbol, {'risk': 'unknown', 'dividend': 'unknown'})
+
+        # Minimal logic: if qty < 5, "Buy more?"; else "Hold or Sell?"
+        # But let's refine: if it's high risk and quantity is large, maybe "Consider selling some"
+        if qty < 5:
+            owned_advice[owned_symbol] = "Buy more?"
+        else:
+            if data['risk'] == 'high' and qty >= 10:
+                owned_advice[owned_symbol] = "You have a large high-risk holding—consider selling some?"
+            else:
+                owned_advice[owned_symbol] = "Hold"
+
+    return recommended, owned_advice
+
+
+
+
+#######################################################################################################################################
+
 #privacy page 
 @app.route ('/privacyStatement')
 def privacyPage():

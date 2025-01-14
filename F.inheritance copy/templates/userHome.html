@@ -1,33 +1,128 @@
-<!-- HTML file, displays the home page depending if the user is standard or admin 
-Author: Ana Paula Goncalves 
-Student Number:21025329-->
+<!-- userHome.html 
+     Displays a summary of the user’s budget on the left,
+     and a pie chart (pizza graph) on the right. 
+     Author: Ana Paula Goncalves
+     Student Number: 21025329
+-->
 
-{%extends "base2.html"%}
+{% extends "base2.html" %}
 
-{%block head %}
-    {%block title%} 
-    {{super()}}
-    {%endblock%}
-{%endblock%}
+{% block head %}
+    {% block title%} 
+        {{ super() }}
+    {% endblock %}
+    <style>
+        /* Container for the main content */
+        .home-container {
+            display: flex;
+            flex-wrap: wrap; /* so it wraps on smaller screens */
+            margin: 20px;
+            box-sizing: border-box;
+        }
 
-{%block content%}
-<body>    
-<div class="col-12 col-m-9 col-x-12">
+        /* Sidebar (buttons) */
+        .tab {
+            position: fixed;
+            top: 100px;  /* Adjust according to your header’s height */
+            left: 0;
+            width: 200px;
+            background-color: #C8A2C8;
+            padding: 15px;
+            box-sizing: border-box;
+            height: calc(100vh - 100px);
+            overflow-y: auto;
+        }
+        .tab button {
+            width: 100%;
+            margin-bottom: 10px;
+            background-color: #C8A2C8;
+            border: none;
+            color: white;
+            text-align: left;
+            padding: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .tab button:hover {
+            background-color: #4B0082;
+        }
 
+        /* Main content: offset from the sidebar */
+        .main-content {
+            margin-left: 220px; /* offset to not overlap with .tab */
+            width: calc(100% - 220px);
+            box-sizing: border-box;
+            padding: 20px;
+        }
+
+        h1.font {
+            font-weight: bold;
+            color: #4B0082;
+        }
+
+        /* Two-column layout inside main-content */
+        .budget-summary {
+            display: flex;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .summary-left,
+        .chart-right {
+            flex: 1 1 50%;
+            min-width: 300px; /* ensures columns don't become too narrow */
+            padding: 20px;
+        }
+
+        .summary-left h2,
+        .chart-right h2 {
+            margin-top: 0;
+            color: #4B0082;
+        }
+
+        /* Styles for the budget summary items */
+        .summary-item {
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+        .summary-item span {
+            font-weight: bold;
+        }
+
+        /* Override or remove the original #budgetPieChart styles */
+        /* We'll rely on our container to size the chart properly */
+        #budgetPieChart {
+            background: #f8f8f8;
+            border-radius: 5px;
+        }
+
+        /* Additional styling for error messages, etc. */
+        .error-message {
+            color: red;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<body>
+    <!-- Left Sidebar -->
     <div class="tab">   
-        <button type="button" onclick="location.href='/userAccount';"> My account</button> 
-        <button type="button" onclick="location.href='/view_budget';"> View Budget</button> 
-        <button type="button" onclick="location.href='/createBudget/';"> Create Budget</button> 
-        <button type="button" onclick="location.href='/report';"> Your Patterns</button> 
-        <button type="button" onclick="location.href='/calendarView';"> Calendar View</button> <!-- this will allow the user to view their current payment dates here - add a button so the user can edit billing dates-->
-        <button type="button" onclick="location.href='/';"> Investments Tracking</button> <!-- this is a possible future implementation for investement-->
-        <button type="button" onclick="location.href='/';"> Chat to Evan</button> <!-- AI assistant.-->
-        <button type="button" onclick="location.href='/privacyStatement';"> Privacy </button>
+        <button type="button" onclick="location.href='/userAccount';"> My Account</button>
+        <button type="button" onclick="location.href='/view_budget';"> View Budget</button>
+        <button type="button" onclick="location.href='/createBudget/';"> Create Budget</button>
+        <button type="button" onclick="location.href='/report';"> Your Patterns</button>
+        <button type="button" onclick="location.href='/calendarView';"> Calendar View</button>
+        <button type="button" onclick="location.href='/investments';"> Investments Tracking</button>
+        <button type="button" onclick="location.href='/';"> Chat to Evan</button>
+        <button type="button" onclick="location.href='/privacyStatement';"> Privacy</button>
         <button type="button" onclick="location.href='/cookies';"> Cookies</button>
-        <button type="button" onclick="location.href='/logout/';"> Logout </button> 
+        <button type="button" onclick="location.href='/logout/';"> Logout</button> 
     </div>
-    
-        <h1 class="font"> Welcome!</h1>
+
+    <!-- Main content area -->
+    <div class="main-content">
+        <h1 class="font">Welcome{{ ", " + username if username else "" }}!</h1>
 
         {% if error %}
             <div class="error-message">
@@ -36,39 +131,120 @@ Student Number:21025329-->
         {% endif %}
 
         {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            <ul>
-            {% for message in messages %}
-                <li>{{ message }}</li>
-            {% endfor %}
-            </ul>
-        {% endif %}
-    {% endwith %}
+            {% if messages %}
+                <ul>
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
 
-        <p> in the rest of this we should be able to provide the user with a brief view of their current budget</p>
-        <h2>
-            daily budget: £ xxxx (how much you can spend today) </br>
-            possible graph to the side (right) </h2>
-        
-        </br>
-        
+        <p>Below is a brief view of your current budget.</p>
 
-        {% if usertype == 'admin' %} 
-            <div class="t2"> <button class="logButton" type="button" onclick="location.href='/adminfeatures/';">Admin Features</button>
-                <a class="button" href='/logout/'> Logout </a> </br> </div>
-        {% endif %}
+        <!-- Two-column layout: summary on left, chart on right -->
+        <div class="budget-summary">
 
-        {% if usertype == 'standard' %} 
-           <!-- add the dashboard features here-->
-        {% endif %}        
+            <!-- LEFT: Summary of income, expenses, savings -->
+            <div class="summary-left">
+                <h2>Your Budget Summary</h2>
+                <div class="summary-item">Income: <span>£{{ total_income }}</span></div>
+                <div class="summary-item">Expenses: <span>£{{ total_expenses }}</span></div>
+                <div class="summary-item">Savings: <span>£{{ total_savings }}</span></div>
 
-    </div>      
-</div>
-</div>  
-</div>
+                {% if usertype == 'admin' %}
+                    <div class="t2"> 
+                        <button class="logButton" type="button" onclick="location.href='/adminfeatures/';">Admin Features</button>
+                        <a class="button" href='/logout/'> Logout </a>
+                    </div>
+                {% endif %}
+
+                {% if usertype == 'standard' %}
+                    <!-- Additional dashboard features for standard user -->
+                {% endif %}
+            </div>
+
+            <!-- RIGHT: Pie Chart representation -->
+            <!-- Make sure there's enough vertical space for the chart with min-height or explicit size -->
+            <div class="chart-right" style="position: relative; min-height: 450px;">
+                <h2>Budget Breakdown</h2>
+                <!-- Wrap the canvas in a fixed 400x400 container to ensure the chart is visible -->
+                <div style="width: 400px; height: 400px; margin: 0 auto;">
+                    <canvas id="budgetPieChart"></canvas>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+<!-- Include Chart.js from a CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const totalIncome = {{ total_income or 0 }};
+    const totalExpenses = {{ total_expenses or 0 }};
+    const totalSavings = {{ total_savings or 0 }};
+
+    console.log("Income:", totalIncome);
+    console.log("Expenses:", totalExpenses);
+    console.log("Savings:", totalSavings);
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const ctx = document.getElementById('budgetPieChart').getContext('2d');
+
+        // Safeguard if canvas is missing
+        if (!ctx) {
+            console.error("Canvas #budgetPieChart not found");
+            return;
+        }
+
+        let grandTotal = totalIncome + totalExpenses + totalSavings;
+        // Avoid zero total causing an invisible chart
+        if (grandTotal === 0) {
+            console.warn("All budget values are zero - using fallback data to avoid invisible chart.");
+            // You can either show an alert or just put a single slice
+            // For demonstration, let's show single slice:
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['No Data'],
+                    datasets: [{
+                        data: [1],
+                        backgroundColor: ['#E6E6FA']
+                    }]
+                },
+                options: { 
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom' } }
+                }
+            });
+            return;
+        }
+
+        // Build the actual data
+        new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: ['Income', 'Expenses', 'Savings'],
+                datasets: [{
+                    data: [ totalIncome, totalExpenses, totalSavings ],
+                    backgroundColor: [ '#4C9F50', '#CF3535', '#5680E9' ],
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom' }
+                }
+            }
+        });
+    });
+</script>
 </body>
-{%endblock%}
+{% endblock %}
 
-{%block footer%}
-{{super()}}
-{%endblock%}
+{% block footer %}
+{{ super() }}
+{% endblock %}

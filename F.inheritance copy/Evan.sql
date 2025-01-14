@@ -45,6 +45,16 @@ CREATE TABLE savings (
     FOREIGN KEY (username) REFERENCES users(username) ON DELETE CASCADE
 );
 
+CREATE TABLE stocks_owned (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(255),            -- references users.username
+    symbol VARCHAR(20) NOT NULL,      -- e.g., "AAPL", "TSLA", etc.
+    quantity INT NOT NULL DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (username) REFERENCES users(username) ON DELETE CASCADE
+);
+
 SELECT budgets.* 
 FROM budgets
 JOIN users ON users.id = budgets.user_id
