@@ -1,4 +1,4 @@
-USE Evan;
+USE evan;
 DROP TABLE  IF EXISTS users; 
 CREATE table users (id INTEGER NOT NULL AUTO_INCREMENT, 
 username VARCHAR(64) NOT NULL UNIQUE,  
@@ -55,19 +55,4 @@ CREATE TABLE stocks_owned (
     FOREIGN KEY (username) REFERENCES users(username) ON DELETE CASCADE
 );
 
-SELECT budgets.* 
-FROM budgets
-JOIN users ON users.id = budgets.user_id
-WHERE users.username = %s;
 
-INSERT INTO users (username, password_hash) VALUES ('test','123');
-
-
-INSERT INTO users (username, password_hash, usertype) VALUES ('ana','123456', 'admin');
-DELETE from users;
-SELECT * from users;
-#So signup through your app for an admin account, it will create a standard
-#user account. Then manually CHANGE value for usertype field for 
-#the admin user to 'admin' and the system will consider this user as admin user.
-# the update statement will be something like (do not forget to change username):
-#UPDATE users SET usertype = 'admin' WHERE username = 'username';
