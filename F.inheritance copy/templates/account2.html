@@ -21,13 +21,15 @@ Student Number:21025329-->
         <h1 style="text-align: center;">Register or Log in</h1>
         <p style="color:red; text-align:center;">{{error}}</p>
         <div class="option">
-                <form action="/register/" method="post"> 
+                <form action="/register/" method="POST"> 
 
                     <label for="Username" class="font">  Username: </label> 
                     <input class ="logInput" type="text" name="username" value="{{request.form.username}}"></br>
 
+
                     <label for="password"class="font">Password:</label>
                     <input  class="logInput"type="password" name="password"value="{{request.form.password}}"></br>
+                    
                     <input type="submit" class= "logButton" value="Register"></br>
                 </form> 
 

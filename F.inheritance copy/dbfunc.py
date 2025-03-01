@@ -4,8 +4,8 @@ from mysql.connector import errorcode
 # MYSQL CONFIG VARIABLES
 hostname    = "localhost"
 username    = "root"
-passwd  = "<An4>gon"
-db = "Evan"
+passwd  = "<An4>gonca"
+db = "evan"
 
 def getConnection():    
     try:

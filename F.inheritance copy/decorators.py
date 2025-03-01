@@ -93,17 +93,22 @@ def homepage(usertype):
 
 
 ###############################################################################################################
-@app.route('/register/', methods=['POST', 'GET'])
+@app.route('/register/', methods=['POST'])
 def register():
     error = ''
     print('Register start')
     try:
-        if request.method == "POST":         
+        if request.method == "POST":  
+            print('inside post')      
             username = request.form['username']
-            password = request.form['password']                    
-            if username != None and password != None:           
+            password = request.form['password']    
+            print ('after username and password')                
+            if username != None and password != None:    
+                print('inside username and password error')       
                 conn = dbfunc.getConnection()
-                if conn != None:    #Checking if connection is None           
+                print ('connected to db')
+                if conn != None:    #Checking if connection is None       
+                    print ('connection is not none')    
                     if conn.is_connected(): #Checking if connection is established
                         print('MySQL Connection is established')                          
                         dbcursor = conn.cursor()    #Creating cursor object 

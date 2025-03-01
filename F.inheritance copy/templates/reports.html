@@ -85,9 +85,9 @@ Student Number:21025329-->
             </tr>
             <tr>
                 <td>{{ budget_name }}</td>
-                <td>${{ budget_amount }}</td>
-                <td>${{ total_expenses }}</td>
-                <td>${{ budget_amount - total_expenses }}</td>
+                <td>£{{ budget_amount }}</td>
+                <td>£{{ total_expenses }}</td>
+                <td>£{{ budget_amount - total_expenses }}</td>
             </tr>
         </table>
     </div>
@@ -107,7 +107,7 @@ Student Number:21025329-->
                 <tr>
                     <td>{{ expense.date }}</td>
                     <td>{{ expense.name }}</td>
-                    <td>${{ expense.amount }}</td>
+                    <td>£{{ expense.amount }}</td>
                 </tr>
             {% endfor %}
             </tbody>
@@ -121,7 +121,7 @@ Student Number:21025329-->
             Keep in mind this is an approximate figure and not a guarantee.
         </p>
         <div class="prediction-result">
-            Expected Next Month's Expenses: ${{ predicted_expenses }}
+            Expected Next Month's Expenses: £{{ predicted_expenses }}
         </div>
     </div>
 

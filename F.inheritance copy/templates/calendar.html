@@ -239,7 +239,7 @@ Student Number:21025329-->
                                 expenseList.classList.add("expenses-list");
                                 expenseList.textContent = "Expenses:";
                                 dayExpenses.forEach(exp => {
-                                    expenseList.textContent += `\n- ${exp.name}: $${exp.amount}`;
+                                    expenseList.textContent += `\n- ${exp.name}: £${exp.amount}`;
                                 });
                                 dayCell.appendChild(expenseList);
                             }
@@ -249,7 +249,7 @@ Student Number:21025329-->
                                 incomeList.classList.add("income-list");
                                 incomeList.textContent = "Income:";
                                 dayIncome.forEach(inc => {
-                                    incomeList.textContent += `\n- ${inc.name}: $${inc.amount}`;
+                                    incomeList.textContent += `\n- ${inc.name}: £${inc.amount}`;
                                 });
                                 dayCell.appendChild(incomeList);
                             }

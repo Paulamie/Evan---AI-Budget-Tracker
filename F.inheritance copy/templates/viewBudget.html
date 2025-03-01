@@ -93,8 +93,8 @@ Student Number: 21025329 -->
     <table>
         <tr>
             <td><strong>Budget Name:</strong> {{ budget_name }}</td>
-            <td><strong>Total Budget Amount:</strong> ${{ total_budget_amount }}</td>
-            <td><strong>Remaining Budget:</strong> ${{ remaining_budget }}</td>
+            <td><strong>Total Budget Amount:</strong> £{{ total_budget_amount }}</td>
+            <td><strong>Remaining Budget:</strong> £{{ remaining_budget }}</td>
         </tr>
     </table>
 
@@ -119,7 +119,7 @@ Student Number: 21025329 -->
                     {% for income in incomes %}
                         <tr>
                             <td>{{ income[2]}}</td>
-                            <td>${{ income[3]}}</td>
+                            <td>£{{ income[3]}}</td>
 
                             <td>
                                 <form action="{{ url_for('delete_income', income_id=income[0]) }}" method="post" style="display:inline;">
@@ -131,7 +131,7 @@ Student Number: 21025329 -->
                 </tbody>
             </table>
             <h3>Total Income:</h3>
-            <p>${{ total_income }}</p>
+            <p>£{{ total_income }}</p>
         </div>
 
         <div class="table-wrapper">
@@ -147,7 +147,7 @@ Student Number: 21025329 -->
                     {% for expense in expenses %}
                         <tr>
                             <td>{{ expense[2] }}</td>
-                            <td>${{ expense[3] }}</td>
+                            <td>£{{ expense[3] }}</td>
 
                             <td>
                                 <form action="{{ url_for('delete_expense', expense_id=expense[0]) }}" method="post">
@@ -159,7 +159,7 @@ Student Number: 21025329 -->
                 </tbody>
             </table>
             <h3>Total Expenses:</h3>
-            <p>${{ total_expenses }}</p>
+            <p>£{{ total_expenses }}</p>
         </div>
 
         <div class="table-wrapper">
@@ -175,7 +175,7 @@ Student Number: 21025329 -->
                     {% for saving in savings %}
                         <tr>
                             <td>{{ saving.name }}</td>
-                            <td>${{ saving.amount }}</td>
+                            <td>£{{ saving.amount }}</td>
 
                             <td>
                                 <!-- Use the saving['id'] to pass the ID of the saving to the delete route -->
@@ -188,7 +188,7 @@ Student Number: 21025329 -->
                 </tbody>
             </table>
             <h3>Total Savings:</h3>
-            <p>${{ total_savings }}</p> 
+            <p>£{{ total_savings }}</p> 
         </div>
     </div>
 
