@@ -55,10 +55,10 @@ def train_spending_model_tf():
     ])
 
     model.compile(
-        optimizer='adam',
-        loss='mse',       # MSE for regression
-        metrics=['mae']   # track mean absolute error
-    )
+    optimizer='adam',
+    loss='mean_squared_error',  
+    metrics=['mae']
+)
 
     # 6. Train the model
     history = model.fit(

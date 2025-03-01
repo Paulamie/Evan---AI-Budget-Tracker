@@ -621,10 +621,7 @@ def advice_on_expenses(user_expenses, predicted_next_month):
 @login_required
 def view_report():
     username = session['username']
-    predicted_expenses = predict_user_spending_tf(username)
-    advice_list = advice_on_expenses(expenses_list, predicted_expenses)
-
-
+    
     conn = dbfunc.getConnection()
 
     with conn.cursor() as cursor:
@@ -644,6 +641,8 @@ def view_report():
         for row in expenses_data
     ]
 
+    predicted_expenses = predict_user_spending_tf(username)
+    advice_list = advice_on_expenses(expenses_list, predicted_expenses)
     
     return render_template(
         'reports.html',
