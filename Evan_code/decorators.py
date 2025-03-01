@@ -5,6 +5,10 @@ import gc
 from functools import wraps
 import dbfunc, mysql.connector 
 from datetime import datetime
+import tensorflow as tf
+from tensorflow import keras
+import numpy as np
+
  
 app = Flask (__name__) #instantiating flask app
 app.secret_key = 'Super Secret' #secret key for sessions 
@@ -561,31 +565,66 @@ def update_user_data():
 
 #######################################################################################################################################
 
-def predict_future_expenses(expenses, months=3, growth_factor=1.05): #simple prediction algorithm - for now, later on implement machine learning
-    if not expenses:
-        return 0.0  # No data, cannot predict
-    
-    username = session['username']
-    conn = dbfunc.getConnection()
-        
-    with conn.cursor() as cursor:
-        cursor.execute("SELECT * FROM expenses WHERE username = %s", (username,))
-        expenses = cursor.fetchall()
-        
-    total_spent = sum(float(expense[3]) for expense in expenses) if expenses else 0.0  # Convert to float
-    # If you want a monthly average, and 'expenses' is only for 'months' months:
-    average_spent = total_spent / months
-    
-    # Apply a small growth factor to account for monthly cost increases
-    predicted_next_month = average_spent * growth_factor
-    return round(predicted_next_month, 2)
+# Load the model once (e.g., at startup or lazily) - optional
+model = keras.models.load_model('spending_model_tf.h5')
 
+def predict_user_spending_tf(username):
+    conn = dbfunc.getConnection()
+    with conn.cursor() as cursor:
+        # Retrieve the user’s last month’s total expenses
+        cursor.execute("""
+            SELECT SUM(expense_amount)
+            FROM expenses
+            WHERE username=%s
+              AND MONTH(created_at) = MONTH(CURDATE())
+              AND YEAR(created_at) = YEAR(CURDATE());
+        """, (username,))
+        last_month_expenses = cursor.fetchone()[0] or 0.0
+
+        # Retrieve last month’s total income
+        cursor.execute("""
+            SELECT SUM(income_amount)
+            FROM income
+            WHERE username=%s
+              AND MONTH(created_at) = MONTH(CURDATE())
+              AND YEAR(created_at) = YEAR(CURDATE());
+        """, (username,))
+        last_month_income = cursor.fetchone()[0] or 0.0
+
+    conn.close()
+
+    # Convert to np array matching the model's input shape (batch_size=1, features=2)
+    X_current = np.array([[last_month_expenses, last_month_income]], dtype=float)
+    
+    # Use the TensorFlow model to predict
+    predicted_array = model.predict(X_current)
+    predicted_value = predicted_array[0][0]  # single value
+
+    return round(predicted_value, 2)
+
+def advice_on_expenses(user_expenses, predicted_next_month):
+    # If predicted_next_month is significantly higher than user’s average,
+    # propose some cost-cutting or new income ideas.
+    # Possibly parse biggest category from user_expenses
+    # This is a custom heuristic approach, separate from the ML model.
+    
+    # Example:
+    advice_list = []
+    if predicted_next_month > sum(e['amount'] for e in user_expenses[-3:]) / 3 + 100:
+        advice_list.append("Your expenses seem to be growing quickly. Consider reviewing monthly subscriptions.")
+    # more logic can be added here
+
+    return advice_list
 
 #page for the reports/ user patterns 
 @app.route('/report')
 @login_required
 def view_report():
     username = session['username']
+    predicted_expenses = predict_user_spending_tf(username)
+    advice_list = advice_on_expenses(expenses_list, predicted_expenses)
+
+
     conn = dbfunc.getConnection()
 
     with conn.cursor() as cursor:
@@ -598,17 +637,13 @@ def view_report():
 
         cursor.execute("SELECT expense_name, expense_amount, DATE(created_at) as date FROM expenses WHERE username = %s ORDER BY created_at DESC", (username,))
         expenses_data = cursor.fetchall()
-
-    # Convert 'expenses_data' to a list of objects for easier manipulation
-    # e.g., [ { 'date': row[2], 'name': row[0], 'amount': row[1] }, ... ]
+    conn.close()
+    
     expenses_list = [
         {'name': row[0], 'amount': float(row[1]), 'date': row[2]} 
         for row in expenses_data
     ]
 
-    # Simple predictive approach
-    # - For demonstration, assume the user only has 3 months of data
-    predicted_expenses = predict_future_expenses(expenses_list, months=3, growth_factor=1.05)
     
     return render_template(
         'reports.html',
@@ -616,7 +651,8 @@ def view_report():
         budget_amount=float(budget_data[1]),
         total_expenses=float(total_expenses_data[0]) if total_expenses_data[0] else 0.0,
         expenses=expenses_list,
-        predicted_expenses=predicted_expenses
+        predicted_expenses=predicted_expenses,
+        advice_list=advice_list,
     )
 
 #######################################################################################################################################

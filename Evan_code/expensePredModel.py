@@ -5,12 +5,13 @@ import numpy as np
 import mysql.connector
 import tensorflow as tf
 from tensorflow import keras
+from tensorflow.keras import layers
 
 def train_spending_model_tf():
     # 1. Fetch data from your MySQL database
     conn = mysql.connector.connect(
-        hostname    = "localhost",
-        username    = "root",
+        host    = "localhost",
+        user   = "root",
         password  = "<An4>gonca",
         database = "evan"
     )
@@ -45,13 +46,10 @@ def train_spending_model_tf():
     X = df[['monthly_expenses', 'monthly_income']].values
     y = df['future_expenses'].values
 
-    # Convert your year_month to numeric if you want to incorporate time trend, or skip for simplicity
-    # e.g. df['time_idx'] = (df['year_month'] - df['year_month'].min()).apply(lambda p: p.n)
-    # X = np.column_stack([X, df['time_idx'].values])
 
     # 5. Define a simple Keras model
     model = keras.Sequential([
-        layers.Dense(16, activation='relu', input_shape=(2,)),  # or 3 if you add time_idx
+        layers.Dense(16, activation='relu', input_shape=(2,)),  
         layers.Dense(8, activation='relu'),
         layers.Dense(1)  # single output: future_expenses
     ])
@@ -72,7 +70,7 @@ def train_spending_model_tf():
     )
 
     # 7. Save the trained model
-    model.save('spending_model_tf')
+    model.save('spending_model_tf.h5')  
     print("TensorFlow model trained and saved to 'spending_model_tf' folder.")
 
 if __name__ == "__main__":
