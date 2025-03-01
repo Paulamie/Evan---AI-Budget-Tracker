@@ -5,15 +5,14 @@ import numpy as np
 import mysql.connector
 import tensorflow as tf
 from tensorflow import keras
-from tensorflow.keras import layers
 
 def train_spending_model_tf():
     # 1. Fetch data from your MySQL database
     conn = mysql.connector.connect(
-        host='localhost',
-        user='myuser',
-        password='mypass',
-        database='mydb'
+        hostname    = "localhost",
+        username    = "root",
+        password  = "<An4>gonca",
+        database = "evan"
     )
     df_expenses = pd.read_sql("SELECT username, expense_amount, created_at FROM expenses", conn)
     df_income = pd.read_sql("SELECT username, income_amount, created_at FROM income", conn)
