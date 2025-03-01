@@ -1,0 +1,77 @@
+<!-- HTML file, privacy statement page 
+Author: Ana Paula Goncalves 
+Student Number: 21025329 -->
+{% extends "base2.html" %}
+
+{% block head %}
+    {% block title %} 
+        {{ super() }} 
+    {% endblock %}
+{% endblock %}
+
+{% block content %}
+<div class="col-12 col-m-9 col-x-12">
+    <div class="tab">
+        <button type="button" onclick="location.href='/userhome/';"> Home Page</button>
+        <button type="button" onclick="location.href='/editbooking/';">My Account</button>
+        <button type="button" onclick="location.href='/view_budget';">View Budget</button>
+        <button type="button" onclick="location.href='/investments';"> Investments Tracking</button>
+        <button type="button" onclick="location.href='/evan';">Chat to Evan</button>
+        <button type="button" onclick="location.href='/cookies';">Cookies</button>
+        <button type="button" onclick="location.href='/logout/';">Logout</button>
+    </div>
+
+    <h1 class="title">Privacy Statement</h1>
+
+    <h2 class="heading">About this Privacy Policy</h2>
+    <p>
+        This privacy policy applies to the personal data we collect about you through our website, by post, phone, email, 
+        or other forms of communication. </p>
+        <p>It explains how we process personal data and your rights as a data subject. We may update this policy to comply with legal, technical, or business changes.
+    </p>
+
+    <h2 class="heading">What Personal Data We Collect and Why</h2>
+    <p>
+        This section informs you of what information we collect about you and why. Personal data means any information about an individual. 
+        <ul>
+            <li>Identity Data includes first name, surname, username, marital status, title, and date of birth.</li>
+            <li>Contact Data includes billing address, delivery address, email address, and telephone numbers.</li>
+            <li>Transaction Data includes details about payments and purchases.</li>
+            <li>Technical Data includes IP address, login data, browser type, and operating system.</li>
+            <li>Usage Data includes information about how you use our website and services.</li>
+            <li>Marketing and Communications Data includes your preferences for receiving communications.</li>
+        </ul>
+    </p>
+
+    <h3 class="heading">How We Collect Data</h3>
+    <p>
+        <b>Direct Interaction:</b> We collect personal data when you fill in forms, correspond with us, or purchase products.</p>
+        <p><b>Automated Technologies:</b> As you interact with our website, we collect technical data using cookies, server logs, 
+        and similar technologies.
+    </p>
+
+    <h3 class="heading">Who Will Access Your Data</h3>
+    <p>
+        Your personal data will only be seen or used by our employees and trusted third parties, such as:
+        <ul>
+            <li>Business partners, suppliers, and subcontractors involved in the delivery of products or services.</li>
+            <li>Analytics and search engine providers to improve website functionality.</li>
+        </ul>
+    </p>
+
+    <h4 class="heading">How Do We Protect Your Data?</h4>
+    <p>
+        We take your privacy seriously and are committed to maintaining the privacy, security, and accuracy of your data. </p>
+        <p>We implement technical and organizational measures to protect against unauthorized access, alteration, 
+        or destruction of your data.
+    </p>
+
+   
+
+
+</div>
+{% endblock %}
+
+{% block footer %}
+    {{ super() }}
+{% endblock %}

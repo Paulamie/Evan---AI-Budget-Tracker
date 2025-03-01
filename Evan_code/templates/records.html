@@ -1,0 +1,51 @@
+<!-- HTML file, standard user features - this is where the user will be able to create a new budget.
+Author: Ana Paula Goncalves 
+Student Number:21025329-->
+{%extends "base2.html"%}
+
+{%block head %}
+    {%block title%} 
+    {{super()}}
+    {%endblock%}
+{%endblock%}
+
+{%block content%}
+<body>
+<div class="col-12 col-m-9 col-x-12">
+    <div class="tab">   
+        <button type="button" onclick="location.href='/userhome/';"> Home Page</button>
+        <button type="button" onclick="location.href='/report';"> Your Patterns</button> 
+        <button type="button" onclick="location.href='/calendarView';"> Calendar View</button> 
+        <button type="button" onclick="location.href='/investments';"> Investments Tracking</button> 
+        <button type="button" onclick="location.href='/evan';"> Chat to Evan</button> 
+        <button type="button" onclick="location.href='/privacyStatement/';"> Privacy </button>
+        <button type="button" onclick="location.href='/cookies/';"> Cookies</button>
+        <button type="button" onclick="location.href='/logout/';"> Logout </button> 
+    </div>
+
+    <h1 class="font">Hello{{username}}, Ready to Create your Budget?</h1>  
+
+    <form action="/createBudget/" method="post">
+        <input type="text" name="budget[amount]" placeholder="Budget Amount">
+        <input type="text" name="budget[name]" placeholder="Budget Name">
+        <button type="submit">Create Budget</button>
+    </form>
+
+    {% if error %}
+            <div class="error-message">
+                <p>{{ error }}</p>
+            </div>
+        {% endif %}
+    
+
+    <p> also add a table ta displays their current budget automatically</p> 
+
+</div>      
+
+
+</body>
+{%endblock%}
+
+{%block footer%}
+{{super()}}
+{%endblock%}

@@ -1,0 +1,63 @@
+<!-- HTML file,s tandard user features - this is where the user can add the details for their budget after creation
+Author: Ana Paula Goncalves 
+Student Number:21025329-->
+{%extends "base2.html"%}
+
+{%block head %}
+    {%block title%} 
+    {{super()}}
+    {%endblock%}
+{%endblock%}
+
+{%block content%}
+<body>
+<div class="col-12 col-m-9 col-x-12">
+    <div class="tab">   
+        <button type="button" onclick="location.href='/userhome/';"> Home Page</button>
+        
+        <button type="button" onclick="location.href='/report';"> Your Patterns</button> <!-- this will show their patterns in spendings, savings etc.-->
+        <button type="button" onclick="location.href='/calendarView';"> Calendar View</button> <!-- this will allow the user to view their current payment dates here - add a button so the user can edit billing dates-->
+        <button type="button" onclick="location.href='/investments';"> Investments Tracking</button> <!-- this is a possible future implementation for investement-->
+        <button type="button" onclick="location.href='/evan';"> Chat to Evan</button> <!-- AI assistant.-->
+        <button type="button" onclick="location.href='/privacyStatement/';"> Privacy </button>
+        <button type="button" onclick="location.href='/cookies/';"> Cookies</button>
+        <button type="button" onclick="location.href='/logout/';"> Logout </button> 
+    </div>
+
+    <h2 class="font">Now the fun part!</h2>  
+    <h2 class ="font"> How much do you have saved?!!!</h2>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul>
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+
+    <form action="/addvalues/" method="POST">
+    
+        <h2>Add Savings</h2>
+        <input type="text" name="saving_name" placeholder="Saving Name" required>
+        <input type="number" name="saving_amount" placeholder="Saving Amount" required>
+        <button type="submit" name="add_saving">Add Saving</button>
+    </form>
+
+    {% if error %}
+            <div class="error-message">
+                <p>{{ error }}</p>
+            </div>
+        {% endif %}
+    
+    <p> add a table so they can see what they have added so far </p>
+</div>      
+
+
+</body>
+{%endblock%}
+
+{%block footer%}
+{{super()}}
+{%endblock%}

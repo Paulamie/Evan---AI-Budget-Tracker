@@ -1,0 +1,290 @@
+<!-- HTML file, parent file 
+Author: Ana Paula Goncalves 
+Student Number:21025329-->
+<!DOCTYPE html>
+<html>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style> 
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Changed to flex-start to avoid centering */
+            min-height: 100vh; /* Allow the body to take the full height of the viewport */
+            margin: 0;
+            padding-top: 100px;
+            background-color: #E6E6FA;
+        }
+
+        /* Style the tab */
+        .tab {
+        position: fixed; /* Fix the sidebar */
+        top: 100px;         /* Align to the top */
+        left: 0; 
+        background-color: #C8A2C8;
+        width: 10%;
+        height: 900px;
+        padding: 15px; 
+        }
+
+        .tab button {
+            margin-bottom: 10px;
+            padding: 10px 0; /* Adjusted to ensure consistent height */
+            font-size: 14px;
+            color: white;
+            background-color: #9370db;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%; /* Ensures all buttons take the full width of the sidebar */
+            text-align: center; /* Centers the text inside the button */
+            box-sizing: border-box; /* Includes padding in width calculation */
+        }
+        
+        .tab button:hover {
+            background-color: #7a5bb3;
+        }
+        
+        .header {
+            width: 100%;
+            border: 1px;
+            padding: 5px;
+            margin: 0;
+            text-align: center;
+            color: white;
+            background-color:#C8A2C8;
+            position: fixed;
+            top: 0px;
+            font-size: larger;
+            
+        }
+        
+        .logButton {
+            padding: 10px 20px;
+            background-color: #C8A2C8;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: larger;
+            cursor: pointer;
+            margin: 20px;
+        }
+        
+        .logButton:hover {
+            background-color: #4B0082;
+        }
+
+        a:link {
+            color: white;
+            background-color: transparent;
+            text-decoration: none;
+        }
+        a:visited{
+            color: white;
+            background-color: transparent;
+            text-decoration: none;
+            
+        }
+
+        .row::after {
+            content: "";
+            clear:both;
+            display: table;
+        }
+
+        [class*="col-"]{
+            float:left;
+            padding: 10px;
+            border: 1px ;
+        }
+        
+        .font {
+            font-weight: bold;
+            margin: 120px 50px 10px 0px;
+            color: #4B0082;
+        }
+        
+        .container {
+            display: block;
+          }
+          
+        
+
+        .bottomcenter {
+            position: center;
+            bottom: 8px;
+            font-size: 18px;
+        }
+
+        img {
+            width: 100%;
+            height: 1000px;
+           
+           
+            /*border: 1px solid #ddd;
+            padding: 1px;
+            width: 1173px;
+            height: 500px;*/
+          }
+         
+          .t2{
+            display:grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px 2em;
+            width 80%%;
+            padding: 5px 10px 5px 10px;
+            background:transparent;
+            color: white;
+            margin: 0px;
+            text-align:left;
+            
+        }
+        .t2 :first-child {
+            align-self: center;
+        }
+
+        .t3{
+            display:grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 2%;
+            width 50%;
+            padding: 1px 5px 1px 5px;
+            background:transparent;
+            color: white;
+            margin: 0px;
+            text-align:left;
+            
+        }
+        .t3 :first-child {
+            align-self: center;
+        }
+
+        .box {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 95%;
+            border: 1px solid royalblue;
+            padding: 1px;
+            margin: 0px;
+            text-align:center;
+            outline-style: inset;
+            outline-color: midnightblue; 
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            color: black;
+            display: block;
+        }
+        .box.button:not(:last-child) {
+            border-bottom: none; /* Prevent double borders */
+          }
+
+        
+          .table {
+            display:grid;
+            grid-template-columns: 1fr;
+            gap 10px 2em;
+            border: 1px solid royalblue;
+            /*position: absolute;*/
+            top: 50%;
+            content: center;
+           
+            transform: translate(0.5%, 0.01%);
+            width 80%%;
+            padding: 5px 10px 5px 10px;
+            margin: 0px;
+            text-align:center;
+            outline-style: inset;
+            outline-color: midnightblue; 
+           -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            color: black; 
+          }
+
+          /* Ensure scrolling works properly */
+            html, body {
+                height: 100%;
+                overflow-y: auto; /* Enable vertical scrolling */
+            }
+
+        
+
+
+/* This is mobile first approach */
+/* For mobile phones: */
+[class*="col-"] {
+    width: 100%;
+}
+
+/* Small devices (portrait tablets and large phones, 600px and up) */
+@media only screen and (min-width: 400px) {
+    /* For mobiles: */
+    .col-x-1 {width: 8.33%;}
+    .col-x-2 {width: 16.66%;}
+    .col-x-3 {width: 25%;}
+    .col-x-4 {width: 33.33%;}
+    .col-x-5 {width: 41.66%;}
+    .col-x-6 {width: 50%;}
+    .col-x-7 {width: 58.33%;}
+    .col-x-8 {width: 66.66%;}
+    .col-x-9 {width: 75%;}
+    .col-x-10 {width: 83.33%;}
+    .col-x-11 {width: 91.66%;}
+    .col-x-12 {width: 100%;}
+}
+
+/* Medium devices (landscape tablets, 768px and up) */
+@media only screen and (min-width: 700px) {
+    /* For tablets: */
+    .col-m-1 {width: 8.33%;}
+    .col-m-2 {width: 16.66%;}
+    .col-m-3 {width: 25%;}
+    .col-m-4 {width: 33.33%;}
+    .col-m-5 {width: 41.66%;}
+    .col-m-6 {width: 50%;}
+    .col-m-7 {width: 58.33%;}
+    .col-m-8 {width: 66.66%;}
+    .col-m-9 {width: 75%;}
+    .col-m-10 {width: 83.33%;}
+    .col-m-11 {width: 91.66%;}
+    .col-m-12 {width: 100%;}
+}
+@media only screen and (min-width: 900px) {
+    /* For desktop: */
+    .col-1 {width: 8.33%;}
+    .col-2 {width: 16.66%;}
+    .col-3 {width: 25%;}
+    .col-4 {width: 33.33%;}
+    .col-5 {width: 41.66%;}
+    .col-6 {width: 50%;}
+    .col-7 {width: 58.33%;}
+    .col-8 {width: 66.66%;}
+    .col-9 {width: 75%;}
+    .col-10 {width: 83.33%;}
+    .col-11 {width: 91.66%;}
+    .col-12 {width: 100%;}
+}  
+        
+     </style>  
+     <head>
+        {%block head%}
+        <title>
+            {%block title%}
+                <div class ="header"> <h1> Evan </h1> </div>
+            {%endblock%}
+        </title>
+        {%endblock%}
+    </head>
+    <body>
+        <div>
+            {%block content%}
+            
+            where the content will go 
+            {%endblock%}
+        </div>
+        {%block footer%}
+        {%endblock%}
+    </body>
+</html>

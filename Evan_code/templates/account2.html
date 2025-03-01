@@ -1,0 +1,62 @@
+<!-- HTML file for the log in/ register page > this will be new login  page.
+Author: Ana Paula Goncalves 
+Student Number:21025329-->
+{% extends "base.html" %} <!--enhreriting the template from this html file.-->
+
+
+{%block head %}
+    {%block title%} 
+    {{super()}}
+    {%endblock%}
+{%endblock%}
+
+
+{%block content%}
+
+
+
+<div class="container"> 
+    <div class="login"> 
+        <!--gives the user the option to register if they don't already have an account-->
+        <h1 style="text-align: center;">Register or Log in</h1>
+        <p style="color:red; text-align:center;">{{error}}</p>
+        <div class="option">
+                <form action="/register/" method="POST"> 
+
+                    <label for="Username" class="font">  Username: </label> 
+                    <input class ="logInput" type="text" name="username" value="{{request.form.username}}"></br>
+
+
+                    <label for="password"class="font">Password:</label>
+                    <input  class="logInput"type="password" name="password"value="{{request.form.password}}"></br>
+                    
+                    <input type="submit" class= "logButton" value="Register"></br>
+                </form> 
+
+                
+                <form action="/login/" method="post"> 
+                <label for="Username" class="font">Username:</label> 
+                <input class="logInput"type="text" name="username" value="{{request.form.username}}"></br>
+                <label for="password" class="font">Password:</label>
+                <input class="logInput" type="password" name="password" value="{{request.form.password}}"></br>
+                <input type="submit" class= "logButton" value="Login">
+                </form>
+            </div>
+    </div>
+
+</div> 
+<!-- consults the database to decide if they should send the user down the path of admin or standar user-->
+{% if usertype == 'admin' %}
+        <a href="/adminfeatures/">Admin Features</a> <br/>
+    {% endif %}
+
+    {% if usertype == 'standard' %}
+        <a href="/userfeatures/">User Features</a> <br/>
+        <a href="/logout/">Logout</a>
+    {% endif %}  
+    
+{%endblock%}
+
+{%block footer%}
+{{super()}}
+{%endblock%} 
