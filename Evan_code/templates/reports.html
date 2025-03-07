@@ -127,6 +127,17 @@ Student Number:21025329-->
 
 </div>
 
+{% if advice_list %}
+<div class="report-section">
+    <h2>Advice & Recommendations</h2>
+    <ul>
+    {% for tip in advice_list %}
+        <li>{{ tip }}</li>
+    {% endfor %}
+    </ul>
+</div>
+{% endif %}
+
 </body>
 {%endblock%}
 

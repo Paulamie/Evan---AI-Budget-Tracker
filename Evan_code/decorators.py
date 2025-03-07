@@ -603,16 +603,46 @@ def predict_user_spending_tf(username):
     return round(predicted_value, 2)
 
 def advice_on_expenses(user_expenses, predicted_next_month):
-    # If predicted_next_month is significantly higher than user’s average,
-    # propose some cost-cutting or new income ideas.
-    # Possibly parse biggest category from user_expenses
-    # This is a custom heuristic approach, separate from the ML model.
+    """
+    Provide advice or tips based on the user's recent expenses and the ML-predicted next month's spending.
     
-    # Example:
+    :param user_expenses: A list of dicts, each with e.g. {'name': ..., 'amount': ..., 'date': ...}.
+        Assumed to be ordered with most recent expense first (DESC).
+    :param predicted_next_month: float, the forecasted spending amount.
+    :return: A list of advice/tips (strings).
+    """
     advice_list = []
-    if predicted_next_month > sum(e['amount'] for e in user_expenses[-3:]) / 3 + 100:
-        advice_list.append("Your expenses seem to be growing quickly. Consider reviewing monthly subscriptions.")
-    # more logic can be added here
+
+    # If no user_expenses data, we cannot compare with last month's spending:
+    if not user_expenses:
+        advice_list.append("Keep going, we don’t have any advice for you this month due to no previous data.")
+        return advice_list
+
+    # The most recent expense record is user_expenses[0] if sorted descending
+    last_month_spent = user_expenses[0]['amount']
+
+    # 1) If predicted is significantly higher than average of last 3 months + 100
+    #    (the existing logic)
+    if len(user_expenses) >= 3:
+        # Sum of the last 3 entries
+        last_three_sum = sum(e['amount'] for e in user_expenses[:3])
+        last_three_avg = last_three_sum / 3.0
+        if predicted_next_month > last_three_avg + 100:
+            advice_list.append(
+                "Your expenses seem to be growing quickly. Consider reviewing monthly subscriptions or bigger expense categories."
+            )
+
+    # 2) Compare predicted_next_month with the single last month's spending:
+    #    If predicted is lower or the same => "You are doing great!"
+    if predicted_next_month <= last_month_spent:
+        advice_list.append(
+            "You are doing great! Your predicted expenses are the same or lower than last month's."
+        )
+    else:
+        # If it's higher than last month, add a smaller-scale caution message
+        advice_list.append(
+            "Your next month's expenses may be higher than last month’s. Try tracking your biggest categories and see where you can save!"
+        )
 
     return advice_list
 
@@ -744,15 +774,19 @@ def calendar():
     
 #######################################################################################################################################
 #investement tracking page 
-@app.route('/investments')
+@app.route('/investments', methods=['GET','POST'])
 @login_required
 def investments():
     username = session['username']
     conn = dbfunc.getConnection()
 
-    user_stocks = []
+    # Suppose we read the user's objective from a form or query param
+    # If none is provided, default to 'dividends' or something
+    objective = request.form.get('objective', 'dividends')
+
+    # Build the user's portfolio
+    user_stocks = {}
     try:
-        # fetching from a 'stocks_owned' table
         with conn.cursor() as cursor:
             cursor.execute("""
                 SELECT symbol, quantity
@@ -760,23 +794,31 @@ def investments():
                 WHERE username = %s;
             """, (username,))
             rows = cursor.fetchall()
-
-            # Build user_stocks as a list of dicts
             for row in rows:
                 symbol = row[0]
                 qty = row[1]
-                suggestion = "Buy more?" if qty < 5 else "Hold"
-                user_stocks.append({
-                    "symbol": symbol,
-                    "quantity": qty,
-                    "suggestion": suggestion
-                })
+                user_stocks[symbol] = qty
     finally:
         conn.close()
 
+    # Get recommended stocks + advice for owned stocks
+    recommended_stocks, owned_advice = investment_advice(objective, user_stocks)
+
+    # Convert owned_stocks dict to a list of objects to display
+    owned_list = []
+    for sym, qty in user_stocks.items():
+        suggestion = owned_advice.get(sym, "Hold")
+        owned_list.append({
+            "symbol": sym,
+            "quantity": qty,
+            "suggestion": suggestion
+        })
+
     return render_template(
         'investment.html',  
-        user_stocks=user_stocks
+        user_stocks=owned_list,
+        recommended_stocks=recommended_stocks,
+        objective=objective
     )
     
 @app.route('/investments/addStock', methods=['POST'])
@@ -843,74 +885,224 @@ def investment_advice(objective, user_portfolio):
                       e.g. 'dividends', 'variety', 'highRisk', 'lowRisk'.
     :param user_portfolio: dict mapping { 'symbol': quantity_owned, ... }.
     :return:
-        recommended: list of symbols to recommend,
+        recommended_stocks: list of dicts with fields
+          { 'symbol', 'price', 'growth_1w', 'growth_1m', 'growth_1y', 'reason' },
         owned_advice: dict mapping { symbol: advice_string, ... } for the user's current holdings.
     """
 
-    # A mock dataset with basic attributes for each symbol
-    # Typically you might get actual data from a DB or API
+    # A more detailed mock dataset with price & growth stats
     mock_stocks = {
-      'T':     {'dividend': 'high',    'risk': 'low'},
-      'KO':    {'dividend': 'steady',  'risk': 'low'},
-      'TSLA':  {'dividend': 'none',    'risk': 'high'},
-      'ARKK':  {'dividend': 'none',    'risk': 'high'},
-      'VXUS':  {'dividend': 'moderate','risk': 'medium'},
-      'VTI':   {'dividend': 'moderate','risk': 'medium'},
-      'BND':   {'dividend': 'steady',  'risk': 'low'},
-      'BRK.B': {'dividend': 'none',    'risk': 'low'},
-      # etc.
+      # Dividends (3-4 examples)
+      'T': {
+          'dividend': 'high', 
+          'risk': 'low',
+          'price': 19.50, 
+          'growth_1w': -0.5, 
+          'growth_1m': 2.0, 
+          'growth_1y': 5.5
+      },
+      'KO': {
+          'dividend': 'steady', 
+          'risk': 'low',
+          'price': 60.10, 
+          'growth_1w': 1.2, 
+          'growth_1m': 1.5, 
+          'growth_1y': 8.0
+      },
+      'PM': {
+          'dividend': 'high',
+          'risk': 'medium',
+          'price': 96.40,
+          'growth_1w': 0.0,
+          'growth_1m': 2.5,
+          'growth_1y': 4.5
+      },
+
+      # Variety (3-4 examples: broad ETFs, different sectors)
+      'VTI': {
+          'dividend': 'moderate', 
+          'risk': 'medium',
+          'price': 210.30, 
+          'growth_1w': 2.0, 
+          'growth_1m': 3.5, 
+          'growth_1y': 10.0
+      },
+      'VXUS': {
+          'dividend': 'moderate',
+          'risk': 'medium',
+          'price': 54.20,
+          'growth_1w': -0.3,
+          'growth_1m': 1.1,
+          'growth_1y': 5.7
+      },
+      'SCHD': {
+          'dividend': 'steady',
+          'risk': 'medium',
+          'price': 74.90,
+          'growth_1w': 0.8,
+          'growth_1m': 2.0,
+          'growth_1y': 7.0
+      },
+
+      # High risk (3-4 examples)
+      'TSLA': {
+          'dividend': 'none', 
+          'risk': 'high',
+          'price': 200.50, 
+          'growth_1w': 5.0, 
+          'growth_1m': 15.0, 
+          'growth_1y': -10.0
+      },
+      'ARKK': {
+          'dividend': 'none',
+          'risk': 'high',
+          'price': 38.75,
+          'growth_1w': 3.2,
+          'growth_1m': 10.1,
+          'growth_1y': -20.0
+      },
+      'COIN': {
+          'dividend': 'none',
+          'risk': 'high',
+          'price': 65.10,
+          'growth_1w': 4.0,
+          'growth_1m': 12.5,
+          'growth_1y': -30.0
+      },
+
+      # Low risk (3-4 examples)
+      'BND': {
+          'dividend': 'steady', 
+          'risk': 'low',
+          'price': 74.60, 
+          'growth_1w': 0.1, 
+          'growth_1m': 0.5, 
+          'growth_1y': 2.0
+      },
+      'BRK.B': {
+          'dividend': 'none', 
+          'risk': 'low',
+          'price': 310.00, 
+          'growth_1w': 1.8, 
+          'growth_1m': 3.2, 
+          'growth_1y': 14.5
+      },
+      'KO': {  # repeating KO as an example, or you can add something else
+          'dividend': 'steady', 
+          'risk': 'low',
+          'price': 60.10, 
+          'growth_1w': 1.2, 
+          'growth_1m': 1.5, 
+          'growth_1y': 8.0
+      }
     }
 
-    # will build a list of recommended stock symbols
-    recommended = []
+    # We'll build a list of recommended stocks with relevant fields
+    recommended_stocks = []
 
     # Example logic for each objective
-    # Feel free to refine or expand these conditions
     for symbol, data in mock_stocks.items():
         # High dividend preference
         if objective == 'dividends':
             # user wants high or steady dividend
             if data['dividend'] in ['high', 'steady']:
-                recommended.append(symbol)
+                recommended_stocks.append({
+                    'symbol': symbol,
+                    'price': data['price'],
+                    'growth_1w': data['growth_1w'],
+                    'growth_1m': data['growth_1m'],
+                    'growth_1y': data['growth_1y'],
+                    'reason': f"Good for dividends ({data['dividend']})"
+                })
 
-        # More variety = aiming for different sectors or a broad ETF
         elif objective == 'variety':
-            # For a naive approach, let's just pick "medium" risk ETFs or multiple sectors
-            # e.g. VTI, VXUS 
-            if symbol in ['VTI', 'VXUS']:
-                recommended.append(symbol)
+            # For a naive approach, let's pick "medium" risk ETFs or multiple sectors
+            if data['risk'] in ['medium']:
+                recommended_stocks.append({
+                    'symbol': symbol,
+                    'price': data['price'],
+                    'growth_1w': data['growth_1w'],
+                    'growth_1m': data['growth_1m'],
+                    'growth_1y': data['growth_1y'],
+                    'reason': f"Broader market or balanced approach"
+                })
 
-        # High-risk approach, looking for growth or speculation
         elif objective == 'highRisk':
             if data['risk'] == 'high':
-                recommended.append(symbol)
+                recommended_stocks.append({
+                    'symbol': symbol,
+                    'price': data['price'],
+                    'growth_1w': data['growth_1w'],
+                    'growth_1m': data['growth_1m'],
+                    'growth_1y': data['growth_1y'],
+                    'reason': "Potential for big growth, but also bigger risk"
+                })
 
-        # Low-risk approach
         elif objective == 'lowRisk':
-            if data['risk'] in ['low', 'medium'] and data['dividend'] != 'none':
-                # e.g. T, KO, BND, BRK.B might qualify
-                recommended.append(symbol)
+            if data['risk'] in ['low'] and data['dividend'] != 'none':
+                recommended_stocks.append({
+                    'symbol': symbol,
+                    'price': data['price'],
+                    'growth_1w': data['growth_1w'],
+                    'growth_1m': data['growth_1m'],
+                    'growth_1y': data['growth_1y'],
+                    'reason': f"Steadier approach with {data['dividend']} dividend"
+                })
 
-        # If you wanted to handle additional objectives, you can continue elif blocks here.
-
-    # Now build advice for the user's owned portfolio
-    # e.g., if user has < 5 shares, we say "Buy more?"; if they have many in a high-risk stock, maybe "Sell or reduce?"
+    # Build advice for the user's owned portfolio
     owned_advice = {}
     for owned_symbol, qty in user_portfolio.items():
-        # if the user doesn't own a known symbol in mock_stocks, we can just skip or default
-        data = mock_stocks.get(owned_symbol, {'risk': 'unknown', 'dividend': 'unknown'})
+        data = mock_stocks.get(owned_symbol, {
+            'risk': 'unknown', 'dividend': 'unknown',
+            'price': 0.0,      # fallback defaults
+            'growth_1w': 0.0,
+            'growth_1m': 0.0,
+            'growth_1y': 0.0
+        })
 
-        # Minimal logic: if qty < 5, "Buy more?"; else "Hold or Sell?"
-        # But let's refine: if it's high risk and quantity is large, maybe "Consider selling some"
+        # 1) If user has fewer than 5 shares, we still say "Buy more?"
         if qty < 5:
             owned_advice[owned_symbol] = "Buy more?"
-        else:
-            if data['risk'] == 'high' and qty >= 10:
-                owned_advice[owned_symbol] = "You have a large high-risk holding—consider selling some?"
-            else:
-                owned_advice[owned_symbol] = "Hold"
+            continue
 
-    return recommended, owned_advice
+        # 2) If user has a large position in a high-risk stock
+        if data['risk'] == 'high' and qty >= 10:
+            owned_advice[owned_symbol] = (
+                "You have a large high-risk holding—consider selling some?"
+            )
+            continue
+
+        # 3) Otherwise, let's do a naive predicted monthly growth
+        # We interpret growth_1w as an approximate 1-week change in %, growth_1m as 1-month,
+        # and growth_1y as annual. We'll assume next month’s growth is the average of:
+        #   - last week’s growth
+        #   - last month’s growth
+        #   - last year’s growth / 12
+        predicted_next_month_growth = (
+            data['growth_1w'] +
+            data['growth_1m'] +
+            (data['growth_1y'] / 12.0)
+        ) / 3.0
+
+        if predicted_next_month_growth > 0.5:
+            # If it's significantly positive
+            owned_advice[owned_symbol] = (
+                f"The stock shows growth potential. It might keep rising. "
+                f"Consider selling now to realize gains, or hold if you want more growth."
+            )
+        elif predicted_next_month_growth < -0.5:
+            # If it's a strong negative number
+            owned_advice[owned_symbol] = (
+                f"The stock may drop in value soon. "
+                f"Either prepare for the dip or consider selling now to minimize losses."
+            )
+        else:
+            # If it's between -0.5% and +0.5% or so, treat it as “no big change”
+            owned_advice[owned_symbol] = (
+                f"No significant change expected. 'Hold' your position."
+            )
+
+        return recommended_stocks, owned_advice
 
 
 

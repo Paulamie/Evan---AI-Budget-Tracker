@@ -132,21 +132,45 @@
         <h1 class="title">Investments Tracking</h1>
 
         <!-- Select Objective -->
-        <div class="objective-select">
-            <label for="objective">Select Your Investment Objective:</label>
-            <select id="objective" onchange="fetchRecommendations()">
-                <option value="dividends">More Dividends</option>
-                <option value="variety">More Variety</option>
-                <option value="highRisk">High Risk/High Reward</option>
-                <option value="lowRisk">Low Risk/Steady Growth</option>
+        <form action="/investments" method="POST">
+            <label>Choose Objective:</label>
+            <select name="objective">
+                <option value="dividends">Dividends</option>
+                <option value="variety">Variety</option>
+                <option value="highRisk">High Risk</option>
+                <option value="lowRisk">Low Risk</option>
             </select>
-        </div>
+            <button type="submit">Update</button>
+        </form>
 
-        <!-- Recommendations Section -->
+ 
+
         <div class="recommendations">
-            <h2>Recommended Stocks</h2>
-            <!-- Dynamically filled by JS based on selected objective -->
-            <ul class="stock-list" id="stockRecommendations"></ul>
+            <h2>Recommended Stocks for Objective: {{ objective }}</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Symbol</th>
+                        <th>Current Price</th>
+                        <th>Growth (1w)</th>
+                        <th>Growth (1m)</th>
+                        <th>Growth (1y)</th>
+                        <th>Reason</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for rec in recommended_stocks %}
+                    <tr>
+                        <td>{{ rec.symbol }}</td>
+                        <td>{{ rec.price }}</td>
+                        <td>{{ rec.growth_1w }}%</td>
+                        <td>{{ rec.growth_1m }}%</td>
+                        <td>{{ rec.growth_1y }}%</td>
+                        <td>{{ rec.reason }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
         </div>
 
         <!-- Owned Stocks Section -->
