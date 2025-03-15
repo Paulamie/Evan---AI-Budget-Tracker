@@ -8,6 +8,7 @@ from datetime import datetime
 import tensorflow as tf
 from tensorflow import keras
 import numpy as np
+import string
 
  
 app = Flask (__name__) #instantiating flask app
@@ -1108,6 +1109,8 @@ def investment_advice(objective, user_portfolio):
 
 
 #######################################################################################################################################
+#Chat bot Evan 
+
 def get_user_budget(username, conn):
     """
     Returns a dictionary with the user's budget information, including:
@@ -1196,71 +1199,137 @@ def get_user_stocks(username, conn):
             stocks[symbol] = qty
     return stocks
 
-@app.route('/evan', methods=['GET', 'POST'])
+
+@app.route('/evan', methods=['GET','POST'])
 @login_required
 def evan():
     username = session['username']
-    conn = dbfunc.getConnection()
-
-    # Load (or create) conversation from session
+    
+    # load conversation (list of messages) from session
     conversation = session.get('conversation', [])
+    # load a 'conversation_state' dict from session for storing user’s objective, etc.
+    conversation_state = session.get('evan_state', {})
 
-    # Fetch the user’s budget info and stocks
+    conn = dbfunc.getConnection()
     user_budget = get_user_budget(username, conn)
     user_stocks = get_user_stocks(username, conn)
-    conn.close()
 
     if request.method == 'POST':
         user_message = request.form.get('user_message', '').strip()
         if user_message:
-            # Append user message
+            # add user message to conversation
             conversation.append({'role': 'user', 'text': user_message})
 
-            # Generate reply
-            assistant_reply = chat_evan_response(user_message, user_budget, user_stocks)
+            # generate chatbot reply
+            assistant_reply = chat_evan_response(
+                user_message,
+                user_budget,
+                user_stocks,
+                conversation_state
+            )
+            # add assistant reply
             conversation.append({'role': 'assistant', 'text': assistant_reply})
 
-        # Store updated conversation in session
+        # update session
         session['conversation'] = conversation
+        session['evan_state'] = conversation_state
+        session.modified = True
+        
+        conn.close()
 
-    # GET request: show chat page
     return render_template('evanChat.html', conversation=conversation)
 
+def normalize_word(w):
+    """Remove trailing punctuation (like >, ., etc.) and convert to lower."""
+    return w.strip(string.punctuation).lower()
 
-def chat_evan_response(user_message, budget, stocks):
-    """
-    A mock "ChatGPT-like" function that has access to the user's budget and stock data.
-    Returns a string response based on the user's query.
-    """
-    # Simple keyword-based approach:
+def chat_evan_response(user_message, budget, stocks, conversation_state):
+   
     text_lower = user_message.lower()
+    words = text_lower.split()
 
-    # Check if user is asking about leftover or budget
+    # Extract relevant budget info
+    leftover = budget.get('leftover', 0.0)
+    total_income = budget.get('total_income', 0.0)
+    total_expenses = budget.get('total_expenses', 0.0)
+
+    # Summarize user’s holdings
+    if stocks:
+        holdings_summary = ", ".join(f"{sym} ({qty} shares)" for sym, qty in stocks.items())
+    else:
+        holdings_summary = "You currently own no stocks."
+
+    # 1. Possibly detect user’s objective 
+    # e.g. "my objective is highrisk" or "i want dividends"
+    possible_objectives = ["dividends","variety","highrisk","lowrisk"]
+    if ("my objective is" in text_lower) or ("i want" in text_lower):
+        for obj in possible_objectives:
+            if obj in text_lower:
+                conversation_state["objective"] = obj
+                return f"Noted! I've set your objective to **{obj}**. Let me know if you have other questions."
+
+    # get the user’s current objective, if set
+    user_objective = conversation_state.get("objective", None)
+
+    # 2. Check for queries about leftover or budget
     if "leftover" in text_lower or "budget" in text_lower:
-        return (f"Your monthly budget leftover is {budget['leftover']}. "
-            f"You earn {budget['total_income']} and spend {budget['total_expenses']} ...")
-    
-    # Check if user is asking about stocks
-    elif "stock" in text_lower or "invest" in text_lower:
-        # For demonstration, we'll just say what the user owns
-        if not stocks:
-            return "You currently don't own any stocks. Maybe consider buying some dividend stocks?"
-        else:
-            # Build a quick summary of their holdings
-            holdings_summary = ", ".join([f"{sym} ({qty} shares)" for sym, qty in stocks.items()])
-            return (f"You own the following stocks: {holdings_summary}. "
-                    "Consider your risk profile before buying or selling more.")
-    
-    # Check for a specific symbol mention, e.g. "T" or "KO"
-    elif "t" in text_lower and "stocks" in text_lower:
-        if "T" in stocks:
-            return "You own T. It's a high-dividend telecom. Holding could be beneficial if you want dividends."
-        else:
-            return "You don't currently own T. It's known for dividends if that's your focus."
+        return (f"Your monthly budget leftover is £{leftover:.2f}. You earn £{total_income:.2f} "
+                f"and spend £{total_expenses:.2f}. Let me know if you'd like advice on "
+                "reducing expenses or increasing your income.")
 
-    # Otherwise, default response
-    return "I'm here to help with your budget and investments—could you clarify what you'd like to know?"
+    # 3. Check for reduce expenses or overspend
+    if any(word in text_lower for word in ["reduce expenses", "cut costs", "overspend"]):
+        return ("Here are some suggestions to reduce expenses:\n"
+                "1) Track your spending categories.\n"
+                "2) Eliminate or downgrade unused subscriptions.\n"
+                "3) Plan meals at home instead of frequent dining out.\n"
+                "Let me know if you need more specific tips.")
 
+    # 4. Check for increase income
+    if any(word in text_lower for word in ["increase income","earn more","side hustle"]):
+        return ("To increase your income, consider:\n"
+                "1) Negotiating a raise.\n"
+                "2) Freelancing or side hustle.\n"
+                "3) Selling unused items.\n"
+                "4) Investing in new skills.\n"
+                "Let me know if you have a preference on approach.")
+
+    # 5. Check for stock or invest queries
+    if "stock" in text_lower or "invest" in text_lower:
+        return (f"{holdings_summary} If you're unsure whether to buy or sell, let me know your goals. "
+                f"Currently, your objective is {user_objective or 'not specified'}.")
+
+    # 6. Detect if user references a specific symbol or buy/sell
+    known_symbols = ["tsla","arkk","t","ko","bnd","vti","vxus","brk.b","pm","schd","coin"]
+    user_symbol = None
+    for w in words:
+        cleaned = normalize_word(w)
+        if cleaned in known_symbols:
+            user_symbol = cleaned.upper()
+            break
+
+    if user_symbol:
+        # check if user said "buy" or "sell"
+        if "sell" in text_lower:
+            # do they own it?
+            if user_symbol in [sym.upper() for sym in stocks.keys()]:
+                return (f"You want to sell {user_symbol}? If you feel the price is up or it's too risky, "
+                        f"selling is an option. Also consider how it fits your objective: {user_objective or 'what is your objective?'}.")
+            else:
+                return f"You don't currently own {user_symbol}, so there's nothing to sell."
+        elif "buy" in text_lower:
+            return (f"Thinking about buying {user_symbol}? Ensure it aligns with your leftover budget "
+                    f"and your objective: {user_objective or 'none'}.")
+        else:
+            # user just referencing symbol
+            return (f"{user_symbol} might fit your objective ({user_objective or 'not set'}). "
+                    "What would you like to do—buy, sell, or learn more?")
+
+    # 7. Fallback
+    return ("I’m here to help with your budget, investments, or general financial tips—"
+            "could you clarify what you'd like to know? You can ask about 'leftover' budget, "
+            "'reduce expenses', 'increase income', or specify 'my objective is X'.")
+    
 @app.route('/evan/clear', methods=['POST'])
 @login_required
 def clear_chat():
