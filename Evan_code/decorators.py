@@ -9,6 +9,7 @@ import tensorflow as tf
 from tensorflow import keras
 import numpy as np
 import string
+import re
 
  
 app = Flask (__name__) #instantiating flask app
@@ -117,8 +118,15 @@ def register():
                     if conn.is_connected(): #Checking if connection is established
                         print('MySQL Connection is established')                          
                         dbcursor = conn.cursor()    #Creating cursor object 
-                        #here we should check if username / email already exists                                                           
-                        password = sha256_crypt.hash((str(password)))          
+                        #here we should check if username / email already exists 
+                                                                               
+                        password = sha256_crypt.hash((str(password)))  
+                        #password = request.form['password']
+                        
+                        if not validate_password(password):
+                            error = "Password must be at least 8 chars, include uppercase, lowercase, and a digit."
+                            return render_template("account2.html", error=error) 
+                               
                         Verify_Query = "SELECT * FROM users WHERE username = %s;"
                         dbcursor.execute(Verify_Query,(username,))
                         rows = dbcursor.fetchall() 
@@ -152,6 +160,17 @@ def register():
     except Exception as e:                
         return render_template("account2.html", error=e)    
     return render_template("account2.html", error=error)
+
+def validate_password(password):
+    if len(password) < 8:
+        return False
+    if not re.search(r"[A-Z]", password):
+        return False
+    if not re.search(r"[a-z]", password):
+        return False
+    if not re.search(r"\d", password):
+        return False
+    return True
 
 
 #/login/ route receives user name and password and checks against db user/pw
@@ -516,10 +535,16 @@ def update_user_data():
                 conn = dbfunc.getConnection()
                 if conn and conn.is_connected():  # Ensure the database connection is established
                     print('MySQL Connection established')
-                    dbcursor = conn.cursor()
+                    dbcursor = conn.cursor()                 
+                    
+                    if not validate_password(password):
+                        error = "Password must be at least 8 chars, include uppercase, lowercase, and a digit."
+                        return render_template("useraccount.html", error=error)
 
                     # Hash the new password
                     hashed_password = sha256_crypt.hash(str(password))
+                    password = request.form['password']
+
 
                     # Check if the user exists
                     verify_query = "SELECT * FROM users WHERE username = %s;"
@@ -563,6 +588,17 @@ def update_user_data():
         error = f"An error occurred: {str(e)}"
         print(error)
         return render_template("useraccount.html", error=error)
+    
+def validate_password(password):
+    if len(password) < 8:
+        return False
+    if not re.search(r"[A-Z]", password):
+        return False
+    if not re.search(r"[a-z]", password):
+        return False
+    if not re.search(r"\d", password):
+        return False
+    return True
 
 #######################################################################################################################################
 
@@ -1103,7 +1139,7 @@ def investment_advice(objective, user_portfolio):
                 f"No significant change expected. 'Hold' your position."
             )
 
-        return recommended_stocks, owned_advice
+    return recommended_stocks, owned_advice
 
 
 
