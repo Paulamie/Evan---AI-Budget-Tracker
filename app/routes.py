@@ -3,18 +3,49 @@ from passlib.hash import sha256_crypt
 import hashlib
 import gc
 from functools import wraps
-import dbfunc, mysql.connector 
+from . import dbfunc
+import mysql.connector
 from datetime import datetime
 import tensorflow as tf
 from tensorflow import keras
 import numpy as np
 import string
 import re
+from flask_mysqldb import MySQL
+import os
 
- 
-app = Flask (__name__) #instantiating flask app
-app.secret_key = 'Super Secret' #secret key for sessions 
-#trying to get this page to prompt you to log in and after you're logged in return you to the bookings page 
+mysql = MySQL()
+app = Flask (__name__)
+
+def create_app(testing=False):
+    app = Flask(__name__)
+    app.secret_key = 'Super Secret'
+    app.config['TESTING'] = testing
+
+    if testing:
+        app.config['MYSQL_HOST'] = 'localhost'
+        app.config['MYSQL_USER'] = 'root'
+        app.config['MYSQL_PASSWORD'] = '<An4>gonca'
+        app.config['MYSQL_DB'] = 'evan_test_db'
+    else:
+        app.config.from_object('config')
+
+    mysql.init_app(app)
+
+    register_routes(app)
+    return app
+
+
+def register_routes(app):
+    @app.route('/')
+    def myAccount():
+        return render_template('account2.html')
+
+    @app.route('/budgets', methods=['POST'])
+    def create_budget():
+        data = request.get_json()
+        # handle budget logic here
+        return {'message': 'Budget created successfully'}, 201
 
 
 def login_required(f):
@@ -102,64 +133,53 @@ def homepage(usertype):
 @app.route('/register/', methods=['POST'])
 def register():
     error = ''
-    print('Register start')
     try:
-        if request.method == "POST":  
-            print('inside post')      
-            username = request.form['username']
-            password = request.form['password']    
-            print ('after username and password')                
-            if username != None and password != None:    
-                print('inside username and password error')       
-                conn = dbfunc.getConnection()
-                print ('connected to db')
-                if conn != None:    #Checking if connection is None       
-                    print ('connection is not none')    
-                    if conn.is_connected(): #Checking if connection is established
-                        print('MySQL Connection is established')                          
-                        dbcursor = conn.cursor()    #Creating cursor object 
-                        #here we should check if username / email already exists 
-                                                                               
-                        password = sha256_crypt.hash((str(password)))  
-                        #password = request.form['password']
-                        
-                        if not validate_password(password):
-                            error = "Password must be at least 8 chars, include uppercase, lowercase, and a digit."
-                            return render_template("account2.html", error=error) 
-                               
-                        Verify_Query = "SELECT * FROM users WHERE username = %s;"
-                        dbcursor.execute(Verify_Query,(username,))
-                        rows = dbcursor.fetchall() 
-                        if dbcursor.rowcount > 0:   #this means there is a user with same name
-                            print('username already taken, please choose another')
-                            error = "User name already taken, please choose another"
-                            return render_template("account2.html", error=error)    
-                        else:   #this means we can add new user            
-                            dbcursor.execute("INSERT INTO users (username, password_hash) VALUES (%s, %s)", (username, password))                
-                            conn.commit()  #saves data in database              
-                            print("Thanks for registering!")
-                            dbcursor.close()
-                            conn.close()
-                            gc.collect()                        
-                            session['logged_in'] = True     #session variables
-                            session['username'] = username
-                            session['usertype'] = 'standard'   #default all users are standard
-                            return render_template("success.html",\
-                             message='User registered successfully and logged in..')
-                    else:                        
-                        print('Connection error')
-                        return 'DB Connection Error'
-                else:                    
-                    print('Connection error')
-                    return 'DB Connection Error'
-            else:                
-                print('empty parameters')
+        if request.method == "POST":
+            username = request.form.get('username')
+            raw_password = request.form.get('password')
+
+            if not username or not raw_password:
+                error = "Username/password missing."
                 return render_template("account2.html", error=error)
-        else:            
-            return render_template("account2.html", error=error)        
-    except Exception as e:                
-        return render_template("account2.html", error=e)    
-    return render_template("account2.html", error=error)
+
+            # 1) Validate raw password (NOT hashed!)
+            if not validate_password(raw_password):
+                error = "Password must be at least 8 chars, with uppercase, lowercase, and a digit."
+                return render_template("account2.html", error=error)
+
+            conn = dbfunc.getConnection()
+            if conn and conn.is_connected():
+                dbcursor = conn.cursor()
+
+                # Check if username already exists
+                dbcursor.execute("SELECT * FROM users WHERE username = %s", (username,))
+                rows = dbcursor.fetchall()
+                if dbcursor.rowcount > 0:
+                    error = "User name already taken. Choose another."
+                    return render_template("account2.html", error=error)
+
+                # 2) Hash only after it passes validation
+                hashed_pass = sha256_crypt.hash(str(raw_password))
+
+                # 3) Insert into DB
+                dbcursor.execute("INSERT INTO users (username, password_hash) VALUES (%s, %s)",
+                                 (username, hashed_pass))
+                conn.commit()
+
+                dbcursor.close()
+                conn.close()
+
+                session['logged_in'] = True
+                session['username'] = username
+                session['usertype'] = 'standard'
+                return render_template("userHome.html", message="User registered successfully and logged in.")
+
+            else:
+                return "DB Connection Error"
+        else:
+            return render_template("account2.html", error=error)
+    except Exception as e:
+        return render_template("account2.html", error=e)
 
 def validate_password(password):
     if len(password) < 8:
@@ -602,8 +622,10 @@ def validate_password(password):
 
 #######################################################################################################################################
 
-# Load the model once (e.g., at startup or lazily) - optional
-model = keras.models.load_model('spending_model_tf.h5')
+
+model_path = os.path.join(os.path.dirname(__file__), '..', 'spending_model_tf.h5')
+model_path = os.path.abspath(model_path)  
+model = keras.models.load_model(model_path)
 
 def predict_user_spending_tf(username):
     conn = dbfunc.getConnection()
@@ -640,14 +662,6 @@ def predict_user_spending_tf(username):
     return round(predicted_value, 2)
 
 def advice_on_expenses(user_expenses, predicted_next_month):
-    """
-    Provide advice or tips based on the user's recent expenses and the ML-predicted next month's spending.
-    
-    :param user_expenses: A list of dicts, each with e.g. {'name': ..., 'amount': ..., 'date': ...}.
-        Assumed to be ordered with most recent expense first (DESC).
-    :param predicted_next_month: float, the forecasted spending amount.
-    :return: A list of advice/tips (strings).
-    """
     advice_list = []
 
     # If no user_expenses data, we cannot compare with last month's spending:
@@ -1110,11 +1124,6 @@ def investment_advice(objective, user_portfolio):
             continue
 
         # 3) Otherwise, let's do a naive predicted monthly growth
-        # We interpret growth_1w as an approximate 1-week change in %, growth_1m as 1-month,
-        # and growth_1y as annual. We'll assume next month’s growth is the average of:
-        #   - last week’s growth
-        #   - last month’s growth
-        #   - last year’s growth / 12
         predicted_next_month_growth = (
             data['growth_1w'] +
             data['growth_1m'] +

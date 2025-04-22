@@ -7,6 +7,18 @@ username    = "root"
 passwd  = "<An4>gonca"
 db = "evan"
 
+from flask import Flask
+
+def create_app(testing=False):
+    app = Flask(__name__)
+    app.config['TESTING'] = testing
+
+    # Register routes (adjust if you're using blueprints)
+    from .routes import register_routes  # Example: move your route registrations here
+    register_routes(app)
+
+    return app
+
 def getConnection():    
     try:
         conn = mysql.connector.connect(host=hostname,                              

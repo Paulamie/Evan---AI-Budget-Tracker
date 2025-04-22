@@ -1,12 +1,10 @@
-USE evan;
-DROP TABLE  IF EXISTS users; 
+USE evan_test_db;
+
 CREATE table users (id INTEGER NOT NULL AUTO_INCREMENT, 
 username VARCHAR(64) NOT NULL UNIQUE,  
 password_hash VARCHAR(128), 
 usertype VARCHAR(8) DEFAULT 'standard', 
 primary key (id));
-
-DROP TABLE  IF EXISTS budgets; 
 
 CREATE TABLE budgets (
     id INT AUTO_INCREMENT PRIMARY KEY,
