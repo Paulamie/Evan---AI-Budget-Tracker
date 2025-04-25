@@ -5,11 +5,18 @@
     {{ super() }}
 {% endblock %}
 <style>
+    body {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
     .chat-container {
-        margin-left: 220px; /* if you have a sidebar of width 220px */
+        margin-left: 220px;
         padding: 20px;
         background: #E6E6FA;
         min-height: 100vh;
+        box-sizing: border-box;
     }
 
     .chat-box {
@@ -17,8 +24,10 @@
         border: 1px solid #ccc;
         border-radius: 6px;
         padding: 20px;
-        width: 60%;
+        width: 80%;
+        max-width: 800px;
         margin-bottom: 20px;
+        box-sizing: border-box;
     }
 
     .message {
@@ -33,30 +42,106 @@
 
     .assistant-message {
         color: #666;
-        margin-left: 20px; /* indent Evan’s responses if desired */
+        margin-left: 20px;
     }
 
     .chat-form {
         display: flex;
+        flex-wrap: wrap;
         gap: 10px;
+        max-width: 800px;
     }
 
     .chat-form input[type="text"] {
-        flex: 1;
+        flex: 1 1 auto;
         padding: 8px;
+        min-width: 200px;
+        box-sizing: border-box;
     }
 
     .chat-form button {
         background-color: #C8A2C8;
         color: #fff;
         border: none;
-        border-radius: 3px;
+        border-radius: 5px;
         padding: 8px 16px;
         cursor: pointer;
     }
 
     .chat-form button:hover {
         background-color: #4B0082;
+    }
+
+    .tab {
+        position: fixed;
+        top: 100px;
+        left: 0;
+        width: 200px;
+        background-color: #C8A2C8;
+        padding: 15px;
+        height: calc(100vh - 100px);
+        overflow-y: auto;
+        box-sizing: border-box;
+    }
+
+    .tab button {
+        width: 100%;
+        margin-bottom: 10px;
+        background-color: #C8A2C8;
+        border: none;
+        color: white;
+        text-align: left;
+        padding: 10px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    .tab button:hover {
+        background-color: #4B0082;
+    }
+
+    @media (max-width: 768px) {
+        .tab {
+            position: static;
+            width: 100%;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            height: auto;
+            padding: 10px;
+        }
+
+        .tab button {
+            flex: 1 1 45%;
+            min-width: 120px;
+            margin: 5px;
+            font-size: 14px;
+            padding: 8px;
+        }
+
+        .chat-container {
+            margin-left: 0;
+            width: 100%;
+            padding: 10px;
+        }
+
+        .chat-box {
+            width: 100%;
+        }
+
+        .chat-form {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .chat-form input[type="text"] {
+            width: 100%;
+        }
+
+        .chat-form button {
+            width: 100%;
+        }
     }
 </style>
 {% endblock %}
@@ -71,15 +156,12 @@
         <button type="button" onclick="location.href='/report';">Your Patterns</button>
         <button type="button" onclick="location.href='/calendarView';">Calendar View</button>
         <button type="button" onclick="location.href='/investments';">Investments Tracking</button>
-        <button type="button" onclick="location.href='/chat';">Chat to Evan</button>
-        <button type="button" onclick="location.href='/privacyStatement';">Privacy</button>
-        <button type="button" onclick="location.href='/cookies';">Cookies</button>
         <button type="button" onclick="location.href='/logout';">Logout</button>
     </div>
 
     <div class="chat-container">
         <h1>Chat with Evan</h1>
-        
+
         <div class="chat-box">
             {% for msg in conversation %}
                 {% if msg.role == 'user' %}
@@ -94,16 +176,15 @@
             {% endfor %}
         </div>
 
-        <!-- Chat input form (POST to /chat) -->
+        <!-- Chat input form -->
         <form method="POST" class="chat-form" action="{{ url_for('evan') }}">
             <input type="text" name="user_message" placeholder="Ask Evan something..." required>
             <button type="submit">Send</button>
         </form>
 
-        <!-- Clear Chat button (POST to /chat/clear) -->
+        <!-- Clear chat form -->
         <form method="POST" action="{{ url_for('clear_chat') }}" style="margin-top: 10px;">
-            <button type="submit"
-                    style="background-color: #888; border: none; border-radius: 3px; padding: 8px 16px; cursor: pointer; color: #fff;">
+            <button type="submit" style="background-color: #888;">
                 Clear Chat
             </button>
         </form>

@@ -5,65 +5,116 @@
     {{ super() }}
     {% endblock %}
     <style>
-        /* Container for the form */
         .form-container {
-            max-width: 600px; /* Limit the width for better proportion */
-            margin: 0 auto; /* Center the form */
-            padding: 20px; /* Add some padding around the form */
-            border: 1px solid #ddd; /* Optional: Add border for better visibility */
-            border-radius: 8px; /* Rounded corners */
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Optional: Shadow for depth */
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
         }
 
-        /* Style for input fields */
         input[type="text"],
         input[type="number"] {
-            width: 100%; /* Make input fields take full width */
-            padding: 10px; /* Add padding inside the inputs */
-            margin: 10px 0; /* Space between inputs */
-            border: 1px solid #ccc; /* Border styling */
-            border-radius: 4px; /* Rounded corners */
-            box-sizing: border-box; /* Include padding and border in width */
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
         }
 
-        /* Style for buttons */
         button {
-            width: 100%; /* Full width for buttons */
-            padding: 10px; /* Padding for buttons */
-            background-color: #C8A2C8; /* Button color */
-            color: white; /* Text color */
-            border: none; /* No border */
-            border-radius: 5px; /* Rounded corners */
-            cursor: pointer; /* Pointer on hover */
-            margin: 10px 0; /* Space between buttons */
+            width: 100%;
+            padding: 10px;
+            background-color: #C8A2C8;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 0;
         }
 
         button:hover {
-            background-color: #4B0082; /* Darker shade on hover */
+            background-color: #4B0082;
         }
 
-        /* Error message style */
         .error-message {
-            color: red; /* Error message color */
-            margin-top: 10px; /* Space above error message */
+            color: red;
+            margin-top: 10px;
+        }
+
+        /* Sidebar (default desktop) */
+        .tab {
+            position: fixed;
+            top: 100px;
+            left: 0;
+            width: 200px;
+            background-color: #C8A2C8;
+            padding: 15px;
+            height: calc(100vh - 100px);
+            overflow-y: auto;
+        }
+
+        .tab button {
+            width: 100%;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        /* Main content spacing */
+        .col-12 {
+            margin-left: 220px;
+            padding: 20px;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .tab {
+                position: static;
+                width: 100%;
+                height: auto;
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                padding: 10px;
+            }
+
+            .tab button {
+                flex: 1 1 45%;
+                font-size: 14px;
+                padding: 8px;
+                margin: 5px;
+                min-width: 120px;
+            }
+
+            .col-12 {
+                margin-left: 0;
+                padding: 15px;
+            }
+
+            .form-container {
+                margin-top: 20px;
+            }
         }
     </style>
 {% endblock %}
 
 {% block content %}
 <body>
-    <div class="col-12 col-m-9 col-x-12">
+    <div class="col-12">
         <div class="tab">   
             <button type="button" onclick="location.href='/userhome/';"> Home Page</button>
-            <button type="button" onclick="location.href='/editbooking/';"> My account</button> 
-            <button type="button" onclick="location.href='/view_budget';"> View Budget</button> <!-- this will allow the user to edit their income/ expenses.-->
-            <button type="button" onclick="location.href='/report';"> Your Patterns</button> <!-- this will show their patterns in spendings, savings etc.-->
-            <button type="button" onclick="location.href='/calendarView';"> Calendar View</button> <!-- this will allow the user to view their current payment dates here - add a button so the user can edit billing dates-->
-            <button type="button" onclick="location.href='/investments';"> Investments Tracking</button> <!-- this is a possible future implementation for investement-->
-            <button type="button" onclick="location.href='/';"> Chat to Evan</button> <!-- AI assistant.-->
-            <button type="button" onclick="location.href='/privacyStatement/';"> Privacy </button>
+            <button type="button" onclick="location.href='/editbooking/';"> My Account</button> 
+            <button type="button" onclick="location.href='/view_budget';"> View Budget</button>
+            <button type="button" onclick="location.href='/report';"> Your Patterns</button>
+            <button type="button" onclick="location.href='/calendarView';"> Calendar View</button>
+            <button type="button" onclick="location.href='/investments';"> Investments Tracking</button>
+            <button type="button" onclick="location.href='/';"> Chat to Evan</button>
+            <button type="button" onclick="location.href='/privacyStatement/';"> Privacy</button>
             <button type="button" onclick="location.href='/cookies/';"> Cookies</button>
-            <button type="button" onclick="location.href='/logout/';"> Logout </button> 
+            <button type="button" onclick="location.href='/logout/';"> Logout</button> 
         </div>
 
         <h2 class="font">Budget Created!!!</h2> 
@@ -79,8 +130,8 @@
         {% endwith %}
 
         <div class="form-container">
-            <p> You have successfully created your budget! </p>
-                <p>  Click 'view budget' to view it</p>
+            <p>You have successfully created your budget!</p>
+            <p>Click 'View Budget' to see it.</p>
         </div>
     </div>      
 </body>

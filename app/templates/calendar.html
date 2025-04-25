@@ -121,6 +121,47 @@ Student Number:21025329-->
             color: #888;
             margin-top: 5px;
         }
+
+        /* Responsive Design */
+    @media (max-width: 768px) {
+        .tab {
+            position: static;
+            width: 100%;
+            height: auto;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 20px;
+            background-color: #C8A2C8;
+        }
+
+        .tab button {
+            flex: 1 1 45%;
+            margin: 5px;
+            font-size: 14px;
+            padding: 8px;
+        }
+
+        .main-container {
+            margin-left: 0;
+            width: 100%;
+            padding: 10px;
+        }
+
+        .calendar-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .calendar-header h2 {
+            font-size: 1.3em;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .calendar-grid {
+            grid-template-columns: 1fr;
+        }
+    }
       </style>
 {%endblock%}
 

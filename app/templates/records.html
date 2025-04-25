@@ -1,49 +1,154 @@
-<!-- HTML file, standard user features - this is where the user will be able to create a new budget.
-Author: Ana Paula Goncalves 
-Student Number:21025329-->
-{%extends "base2.html"%}
+{% extends "base2.html" %}
 
-{%block head %}
-    {%block title%} 
-    {{super()}}
-    {%endblock%}
-{%endblock%}
+{% block head %}
+    {% block title %} 
+        {{ super() }}
+    {% endblock %}
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-{%block content%}
+        .tab {
+            position: fixed;
+            top: 100px;
+            left: 0;
+            width: 200px;
+            background-color: #C8A2C8;
+            padding: 15px;
+            height: calc(100vh - 100px);
+            overflow-y: auto;
+        }
+
+        .tab button {
+            width: 100%;
+            margin-bottom: 10px;
+            font-size: 16px;
+            padding: 10px;
+            border: none;
+            background-color: #C8A2C8;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .tab button:hover {
+            background-color: #4B0082;
+        }
+
+        .col-12 {
+            margin-left: 220px;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .font {
+            color: #4B0082;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+        }
+
+        form {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        button[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            background-color: #C8A2C8;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #4B0082;
+        }
+
+        .error-message {
+            color: red;
+            margin-top: 10px;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .tab {
+                position: static;
+                width: 100%;
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                padding: 10px;
+                height: auto;
+            }
+
+            .tab button {
+                flex: 1 1 45%;
+                font-size: 14px;
+                padding: 8px;
+                margin: 5px;
+                min-width: 120px;
+            }
+
+            .col-12 {
+                margin-left: 0;
+                padding: 15px;
+            }
+
+            form {
+                padding: 10px;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
 <body>
-<div class="col-12 col-m-9 col-x-12">
-    <div class="tab">   
-        <button type="button" onclick="location.href='/userhome/';"> Home Page</button>
-        <button type="button" onclick="location.href='/report';"> Your Patterns</button> 
-        <button type="button" onclick="location.href='/calendarView';"> Calendar View</button> 
-        <button type="button" onclick="location.href='/investments';"> Investments Tracking</button> 
-        <button type="button" onclick="location.href='/evan';"> Chat to Evan</button> 
-        <button type="button" onclick="location.href='/privacyStatement/';"> Privacy </button>
-        <button type="button" onclick="location.href='/cookies/';"> Cookies</button>
-        <button type="button" onclick="location.href='/logout/';"> Logout </button> 
-    </div>
+    <div class="col-12 col-m-9 col-x-12">
+        <div class="tab">   
+            <button type="button" onclick="location.href='/userhome/';"> Home Page</button>
+            <button type="button" onclick="location.href='/report';"> Your Patterns</button> 
+            <button type="button" onclick="location.href='/calendarView';"> Calendar View</button> 
+            <button type="button" onclick="location.href='/investments';"> Investments Tracking</button> 
+            <button type="button" onclick="location.href='/evan';"> Chat to Evan</button> 
+            <button type="button" onclick="location.href='/privacyStatement/';"> Privacy </button>
+            <button type="button" onclick="location.href='/cookies/';"> Cookies</button>
+            <button type="button" onclick="location.href='/logout/';"> Logout </button> 
+        </div>
 
-    <h1 class="font">Hello{{username}}, Ready to Create your Budget?</h1>  
+        <h1 class="font">Hello{{ username }}, Ready to Create your Budget?</h1>  
 
-    <form action="/createBudget/" method="post">
-        <input type="text" name="budget[amount]" placeholder="Budget Amount">
-        <input type="text" name="budget[name]" placeholder="Budget Name">
-        <button type="submit">Create Budget</button>
-    </form>
+        <form action="/createBudget/" method="post">
+            <input type="text" name="budget[amount]" placeholder="Budget Amount">
+            <input type="text" name="budget[name]" placeholder="Budget Name">
+            <button type="submit">Create Budget</button>
+        </form>
 
-    {% if error %}
+        {% if error %}
             <div class="error-message">
                 <p>{{ error }}</p>
             </div>
         {% endif %}
-    
-
-</div>      
-
-
+    </div>      
 </body>
-{%endblock%}
+{% endblock %}
 
-{%block footer%}
-{{super()}}
-{%endblock%}
+{% block footer %}
+    {{ super() }}
+{% endblock %}

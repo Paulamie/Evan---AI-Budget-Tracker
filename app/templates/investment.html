@@ -10,6 +10,12 @@
     {{ super() }}
 {% endblock %}
 <style>
+    body {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
     .tab {
         position: fixed;
         top: 100px;
@@ -21,6 +27,7 @@
         height: calc(100vh - 100px);
         overflow-y: auto;
     }
+
     .tab button {
         width: 100%;
         margin-bottom: 10px;
@@ -31,19 +38,20 @@
         padding: 10px;
         font-size: 16px;
         cursor: pointer;
-        transition: 0.3s;
+        transition: background-color 0.3s;
     }
+
     .tab button:hover {
         background-color: #4B0082;
     }
 
     .main-content {
         margin-left: 220px;
-        width: calc(100% - 220px);
-        box-sizing: border-box;
         padding: 20px;
-        background: #E6E6FA; /* Soft background color */
+        width: calc(100% - 220px);
+        background: #E6E6FA;
         min-height: 100vh;
+        box-sizing: border-box;
     }
 
     h1.title {
@@ -51,62 +59,111 @@
         margin-bottom: 20px;
     }
 
-    .objective-select {
-        margin-bottom: 20px;
-    }
-    .objective-select label {
-        font-weight: bold;
-        margin-right: 10px;
-    }
-
-    .recommendations,
-    .owned-stocks {
+    .recommendations, .owned-stocks {
         background: #fff;
-        border: 1px solid #ccc;
-        border-radius: 6px;
         padding: 20px;
         margin-bottom: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     }
-    .recommendations h2,
-    .owned-stocks h2 {
+
+    .recommendations h2, .owned-stocks h2 {
         margin-top: 0;
         color: #4B0082;
     }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+    }
+
+    table, th, td {
+        border: 1px solid #ccc;
+    }
+
+    th, td {
+        padding: 8px;
+        text-align: center;
+    }
+
     .stock-list {
-        list-style-type: none;
+        list-style: none;
         padding: 0;
     }
+
     .stock-list li {
         margin-bottom: 10px;
     }
+
     .stock-suggestion {
         font-style: italic;
         color: #666;
     }
 
-    /* Form for adding owned stocks */
     .owned-stocks form {
         margin-top: 15px;
     }
-    .owned-stocks input[type="text"],
-    .owned-stocks input[type="number"] {
+
+    input[type="text"],
+    input[type="number"],
+    select {
+        padding: 8px;
         margin-right: 10px;
-        padding: 5px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        width: auto;
     }
-    .owned-stocks button {
+
+    button {
         background-color: #C8A2C8;
-        color: #fff;
+        color: white;
         border: none;
-        border-radius: 3px;
-        padding: 6px 12px;
+        border-radius: 5px;
+        padding: 8px 14px;
         cursor: pointer;
     }
-    .owned-stocks button:hover {
+
+    button:hover {
         background-color: #4B0082;
     }
+
     .error-message {
         color: red;
         margin-top: 10px;
+    }
+
+    @media (max-width: 768px) {
+        .tab {
+            position: static;
+            width: 100%;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            height: auto;
+            padding: 10px;
+        }
+
+        .tab button {
+            flex: 1 1 45%;
+            font-size: 14px;
+            padding: 8px;
+            margin: 5px;
+            min-width: 120px;
+        }
+
+        .main-content {
+            margin-left: 0;
+            width: 100%;
+        }
+
+        table {
+            font-size: 14px;
+        }
+
+        th, td {
+            padding: 6px;
+        }
     }
 </style>
 {% endblock %}

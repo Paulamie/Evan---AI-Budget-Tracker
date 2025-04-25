@@ -1,69 +1,143 @@
 {% extends "base2.html" %}
 
 {% block head %}
-    {% block title %} 
+{% block title %} 
     {{ super() }}
-    {% endblock %}
-    <style>
-        /* Container for the form */
+{% endblock %}
+
+<style>
+    /* Sidebar */
+    .tab {
+        position: fixed;
+        top: 100px;
+        left: 0;
+        width: 200px;
+        background-color: #C8A2C8;
+        padding: 15px;
+        height: calc(100vh - 100px);
+        box-sizing: border-box;
+        overflow-y: auto;
+        z-index: 10;
+    }
+
+    .tab button {
+        width: 100%;
+        margin-bottom: 10px;
+        background-color: #9370db;
+        border: none;
+        border-radius: 5px;
+        color: white;
+        text-align: center;
+        padding: 10px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    .tab button:hover {
+        background-color: #7a5bb3;
+    }
+
+    /* Main content */
+    .main-content {
+        margin-left: 220px;
+        padding: 20px;
+        box-sizing: border-box;
+        min-height: calc(100vh - 100px);
+        background-color: #E6E6FA;
+    }
+
+    h2.font {
+        color: #4B0082;
+        font-weight: bold;
+        margin-top: 20px;
+    }
+
+    /* Form container */
+    .form-container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+        background: #f8f8f8;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    input[type="text"],
+    input[type="number"] {
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
+
+    button {
+        width: 100%;
+        padding: 10px;
+        background-color: #C8A2C8;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-top: 10px;
+    }
+
+    button:hover {
+        background-color: #4B0082;
+    }
+
+    .error-message {
+        color: red;
+        margin-top: 10px;
+    }
+
+    /* Mobile responsiveness */
+    @media (max-width: 768px) {
+        .tab {
+            position: static;
+            width: 100%;
+            height: auto;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .tab button {
+            flex: 1 1 45%;
+            margin: 5px;
+            font-size: 14px;
+            padding: 8px;
+        }
+
+        .main-content {
+            margin-left: 0;
+            padding: 10px;
+        }
+
         .form-container {
-            max-width: 600px; /* Limit the width for better proportion */
-            margin: 0 auto; /* Center the form */
-            padding: 20px; /* Add some padding around the form */
-            border: 1px solid #ddd; /* Optional: Add border for better visibility */
-            border-radius: 8px; /* Rounded corners */
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Optional: Shadow for depth */
+            padding: 15px;
         }
-
-        /* Style for input fields */
-        input[type="text"],
-        input[type="number"] {
-            width: 100%; /* Make input fields take full width */
-            padding: 10px; /* Add padding inside the inputs */
-            margin: 10px 0; /* Space between inputs */
-            border: 1px solid #ccc; /* Border styling */
-            border-radius: 4px; /* Rounded corners */
-            box-sizing: border-box; /* Include padding and border in width */
-        }
-
-        /* Style for buttons */
-        button {
-            width: 100%; /* Full width for buttons */
-            padding: 10px; /* Padding for buttons */
-            background-color: #C8A2C8; /* Button color */
-            color: white; /* Text color */
-            border: none; /* No border */
-            border-radius: 5px; /* Rounded corners */
-            cursor: pointer; /* Pointer on hover */
-            margin: 10px 0; /* Space between buttons */
-        }
-
-        button:hover {
-            background-color: #4B0082; /* Darker shade on hover */
-        }
-
-        /* Error message style */
-        .error-message {
-            color: red; /* Error message color */
-            margin-top: 10px; /* Space above error message */
-        }
-    </style>
+    }
+</style>
 {% endblock %}
 
 {% block content %}
 <body>
-    <div class="col-12 col-m-9 col-x-12">
-        <div class="tab">   
-            <button type="button" onclick="location.href='/userhome/';"> Home Page</button>
-            <button type="button" onclick="location.href='/report';"> Your Patterns</button> 
-            <button type="button" onclick="location.href='/calendarView';"> Calendar View</button> 
-            <button type="button" onclick="location.href='/investments';"> Investments Tracking</button> 
-            <button type="button" onclick="location.href='/evan';"> Chat to Evan</button> 
-            <button type="button" onclick="location.href='/privacyStatement/';"> Privacy </button>
-            <button type="button" onclick="location.href='/cookies/';"> Cookies</button>
-            <button type="button" onclick="location.href='/logout/';"> Logout </button> 
-        </div>
+    <div class="tab">   
+        <button type="button" onclick="location.href='/userhome/';">Home Page</button>
+        <button type="button" onclick="location.href='/report';">Your Patterns</button> 
+        <button type="button" onclick="location.href='/calendarView';">Calendar View</button> 
+        <button type="button" onclick="location.href='/investments';">Investments Tracking</button> 
+        <button type="button" onclick="location.href='/evan';">Chat to Evan</button> 
+        <button type="button" onclick="location.href='/privacyStatement/';">Privacy</button>
+        <button type="button" onclick="location.href='/cookies/';">Cookies</button>
+        <button type="button" onclick="location.href='/logout/';">Logout</button> 
+    </div>
 
+    <div class="main-content">
         <h2 class="font">Add Your Income</h2> 
 
         {% with messages = get_flashed_messages() %}
@@ -83,16 +157,16 @@
                 <button type="submit" name="add_savings">Add Savings</button>
 
                 {% if error %}
-                    <div class="error-message">
-                        <p>{{ error }}</p>
-                    </div>
+                <div class="error-message">
+                    <p>{{ error }}</p>
+                </div>
                 {% endif %}
             </form>
         </div>
-    </div>      
+    </div>
 </body>
 {% endblock %}
 
 {% block footer %}
-    {{ super() }}
+{{ super() }}
 {% endblock %}

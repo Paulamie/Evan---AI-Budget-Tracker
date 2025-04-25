@@ -1,17 +1,14 @@
-<!-- HTML file, standard user features - this is where the user can see their records
-Author: Ana Paula Goncalves 
-Student Number:21025329-->
-{%extends "base2.html"%}
+{% extends "base2.html" %}
 
-{%block head %}
-    {%block title%} 
-    {{super()}}
-    {%endblock%}
+{% block head %}
+    {% block title %} 
+    {{ super() }}
+    {% endblock %}
     <style>
         .report-container {
-            margin-left: 20px;
-            margin-right: 20px;
+            margin: 20px;
             padding: 20px;
+            box-sizing: border-box;
         }
 
         .report-title {
@@ -38,7 +35,8 @@ Student Number:21025329-->
             margin-bottom: 15px;
         }
 
-        .report-table th, .report-table td {
+        .report-table th,
+        .report-table td {
             padding: 8px;
             border: 1px solid #ccc;
             text-align: left;
@@ -53,25 +51,104 @@ Student Number:21025329-->
             color: #333;
             margin-top: 10px;
         }
-    </style>
-{%endblock%}
 
-{%block content%}
+        /* Sidebar */
+        .tab {
+            position: fixed;
+            top: 100px;
+            left: 0;
+            width: 200px;
+            background-color: #C8A2C8;
+            padding: 15px;
+            height: calc(100vh - 100px);
+            overflow-y: auto;
+        }
+
+        .tab button {
+            width: 100%;
+            margin-bottom: 10px;
+            font-size: 16px;
+            padding: 10px;
+            border: none;
+            background-color: #C8A2C8;
+            color: white;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .tab button:hover {
+            background-color: #4B0082;
+        }
+
+        /* Main content layout */
+        .col-12 {
+            margin-left: 220px;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .tab {
+                position: static;
+                width: 100%;
+                height: auto;
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                padding: 10px;
+            }
+
+            .tab button {
+                flex: 1 1 45%;
+                font-size: 14px;
+                padding: 8px;
+                margin: 5px;
+                min-width: 120px;
+            }
+
+            .col-12 {
+                margin-left: 0;
+                padding: 15px;
+            }
+
+            .report-table th,
+            .report-table td {
+                font-size: 14px;
+                padding: 6px;
+            }
+
+            .report-section {
+                padding: 10px;
+            }
+
+            .report-title {
+                font-size: 1.5em;
+            }
+
+            .prediction-result {
+                font-size: 14px;
+                padding: 8px;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
 <body>
 <div class="col-12 col-m-9 col-x-12">
     <div class="tab">   
         <button type="button" onclick="location.href='/userhome/';"> Home Page</button> 
         <button type="button" onclick="location.href='/view_budget';"> View Budget</button> 
-        <button type="button" onclick="location.href='/calendarView';"> Calendar View</button> <!-- this will allow the user to view their current payment dates here - add a button so the user can edit billing dates-->
-        <button type="button" onclick="location.href='/investments';"> Investments Tracking</button> <!-- this is a possible future implementation for investement-->
-        <button type="button" onclick="location.href='/evan';"> Chat to Evan</button> <!-- AI assistant.-->
+        <button type="button" onclick="location.href='/calendarView';"> Calendar View</button>
+        <button type="button" onclick="location.href='/investments';"> Investments Tracking</button>
+        <button type="button" onclick="location.href='/evan';"> Chat to Evan</button>
         <button type="button" onclick="location.href='/privacyStatement/';"> Privacy </button>
         <button type="button" onclick="location.href='/cookies/';"> Cookies</button>
         <button type="button" onclick="location.href='/logout/';"> Logout </button> 
     </div>
 
     <h1 class="font">Your Budget Report</h1>  
-  
     <h1 class="report-title">Monthly Budget Report</h1>
 
     <div class="report-section">
@@ -125,22 +202,20 @@ Student Number:21025329-->
         </div>
     </div>
 
+    {% if advice_list %}
+    <div class="report-section">
+        <h2>Advice & Recommendations</h2>
+        <ul>
+        {% for tip in advice_list %}
+            <li>{{ tip }}</li>
+        {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
 </div>
-
-{% if advice_list %}
-<div class="report-section">
-    <h2>Advice & Recommendations</h2>
-    <ul>
-    {% for tip in advice_list %}
-        <li>{{ tip }}</li>
-    {% endfor %}
-    </ul>
-</div>
-{% endif %}
-
 </body>
-{%endblock%}
+{% endblock %}
 
-{%block footer%}
-{{super()}}
-{%endblock%}
+{% block footer %}
+{{ super() }}
+{% endblock %}
