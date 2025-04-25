@@ -12,18 +12,16 @@
         {{ super() }}
     {% endblock %}
     <style>
-        /* Container for the main content */
         .home-container {
             display: flex;
-            flex-wrap: wrap; /* so it wraps on smaller screens */
+            flex-wrap: wrap;
             margin: 20px;
             box-sizing: border-box;
         }
-
-        /* Sidebar (buttons) */
+    
         .tab {
             position: fixed;
-            top: 100px;  /* Adjust according to your header’s height */
+            top: 100px;
             left: 0;
             width: 200px;
             background-color: #C8A2C8;
@@ -32,6 +30,7 @@
             height: calc(100vh - 100px);
             overflow-y: auto;
         }
+    
         .tab button {
             width: 100%;
             margin-bottom: 10px;
@@ -44,62 +43,100 @@
             cursor: pointer;
             transition: 0.3s;
         }
+    
         .tab button:hover {
             background-color: #4B0082;
         }
-
-        /* Main content: offset from the sidebar */
+    
         .main-content {
-            margin-left: 220px; /* offset to not overlap with .tab */
+            margin-left: 220px;
             width: calc(100% - 220px);
             box-sizing: border-box;
             padding: 20px;
         }
-
+    
         h1.font {
             font-weight: bold;
             color: #4B0082;
         }
-
-        /* Two-column layout inside main-content */
+    
         .budget-summary {
             display: flex;
-            width: 100%;
-            box-sizing: border-box;
+            flex-wrap: wrap;
+            gap: 20px;
         }
-
+    
         .summary-left,
         .chart-right {
-            flex: 1 1 50%;
-            min-width: 300px; /* ensures columns don't become too narrow */
+            flex: 1 1 45%;
+            min-width: 280px;
             padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 6px;
         }
-
+    
         .summary-left h2,
         .chart-right h2 {
             margin-top: 0;
             color: #4B0082;
         }
-
-        /* Styles for the budget summary items */
+    
         .summary-item {
             margin-bottom: 10px;
             font-size: 1.1em;
         }
+    
         .summary-item span {
             font-weight: bold;
         }
-
-        /* Override or remove the original #budgetPieChart styles */
-        /* We'll rely on our container to size the chart properly */
+    
         #budgetPieChart {
-            background: #f8f8f8;
-            border-radius: 5px;
+            width: 100% !important;
+            height: auto !important;
         }
-
-        /* Additional styling for error messages, etc. */
+    
         .error-message {
             color: red;
+        }
+    
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+                padding: 15px;
+            }
+    
+            .tab {
+                position: relative;
+                width: 100%;
+                height: auto;
+                top: 0;
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+    
+            .tab button {
+                width: auto;
+                margin: 5px;
+                font-size: 14px;
+                padding: 8px 12px;
+            }
+    
+            .budget-summary {
+                flex-direction: column;
+            }
+    
+            .chart-right {
+                text-align: center;
+            }
+    
+            .chart-right div {
+                width: 100% !important;
+                max-width: 400px;
+                margin: 0 auto;
+            }
         }
     </style>
 {% endblock %}

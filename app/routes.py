@@ -3,7 +3,7 @@ from passlib.hash import sha256_crypt
 import hashlib
 import gc
 from functools import wraps
-from . import dbfunc
+import dbfunc
 import mysql.connector
 from datetime import datetime
 import tensorflow as tf
@@ -16,37 +16,6 @@ import os
 
 mysql = MySQL()
 app = Flask (__name__)
-
-def create_app(testing=False):
-    app = Flask(__name__)
-    app.secret_key = 'Super Secret'
-    app.config['TESTING'] = testing
-
-    if testing:
-        app.config['MYSQL_HOST'] = 'localhost'
-        app.config['MYSQL_USER'] = 'root'
-        app.config['MYSQL_PASSWORD'] = '<An4>gonca'
-        app.config['MYSQL_DB'] = 'evan_test_db'
-    else:
-        app.config.from_object('config')
-
-    mysql.init_app(app)
-
-    register_routes(app)
-    return app
-
-
-def register_routes(app):
-    @app.route('/')
-    def myAccount():
-        return render_template('account2.html')
-
-    @app.route('/budgets', methods=['POST'])
-    def create_budget():
-        data = request.get_json()
-        # handle budget logic here
-        return {'message': 'Budget created successfully'}, 201
-
 
 def login_required(f):
     @wraps(f)
